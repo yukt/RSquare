@@ -32,6 +32,9 @@ public:
 
     RSquare()
     {
+        FileNameValidation="";
+        FileNameImputation="";
+        FileNameOutput="RsquareOutput";
 
     };
 

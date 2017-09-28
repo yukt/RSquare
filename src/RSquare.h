@@ -3,8 +3,10 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 #include "VcfFileReader.h"
-#include "Dosage.h"
+#include "Haplotype.h"
+
 
 
 using namespace std;
@@ -12,30 +14,42 @@ using namespace std;
 
 
 class RSquare{
-    public:
 
-        RSquare()
-        {
+public:
 
-        };
+    String FileNameValidation, FileNameImputation, FileNameOutput;
 
-        ~RSquare()
-        {
+    int numMarkers, numSamples;
+    vector<string> IndividualName, MarkerID;
 
-        };
+    bool DS = true;
+    Haplotype Validation, Imputation;
+    vector<double> RSquareResult;
 
-        String FileNameValidation, FileNameImputation;
-        int numMarkers, numSamples;
-
-        Dosage DosageInfoValidation, DosageInfoImputation;
-        vector<double> DosageValidation, DosageImputation, RSquareData;
+//    Dosage DosageInfoValidation, DosageInfoImputation;
+//    vector<double> DosageValidation, DosageImputation, RSquareData;
 
 
-        bool GetDosagefromVCFFile(String &VCFFileName_v, String &VCFFileName_i);
-        double CalculateRSquare_VectorWise(vector<double> Validation, vector<double> Imputation);
+    RSquare()
+    {
 
-        bool CalculateRSquare();
-        void printRSquare();
+    };
+
+    ~RSquare()
+    {
+
+    };
+
+
+    bool GetHaplotypeFromVCF();
+    double CalculateRSquare_VectorWise(vector<double> Validation, vector<double> Imputation);
+    bool CalculateRSquare();
+    void printRSquare();
+    bool outputRSquare();
+
+    bool Analysis();
+
+
 
 
 };

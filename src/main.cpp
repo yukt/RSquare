@@ -13,22 +13,33 @@ int main(int argc, char **argv) {
 
     };
 
-    if(argc<2)
+    if(argc < 7)
     {
-
+        cout << "Error! Please check input. Paths for validation, imputation and output are all required." << endl;
+        return 0;
     }
+
+
+    RSquare R;
+
     while ((c = getopt_long(argc, argv, "v:i:o:", longopts, NULL)) != -1){
         switch (c) {
             case 'v':
-                validation_file = optarg;
+                // codes needed here to check if optarg is a valid vcf file.
+
+                R.FileNameValidation = optarg;
                 printf("-v with value %s\n", optarg);
                 break;
+
             case 'i':
-                imputation_file = optarg;
+                // codes needed here to check if optarg is a valid vcf file.
+
+                R.FileNameImputation = optarg;
                 printf("-i with value %s\n", optarg);
                 break;
+
             case 'o':
-                output_file = optarg;
+                R.FileNameOutput = optarg;
                 printf("-o with value %s\n", optarg);
                 break;
 
@@ -54,12 +65,12 @@ int main(int argc, char **argv) {
 //    RSquare R;
 //    cout << "\n" << R.CalculateRSquare_VectorWise(v1,v2) << endl;
 
-    RSquare R;
+//
+//    R.GetDosagefromVCFFile(validation_file, imputation_file);
+//    R.CalculateRSquare();
+//    R.printRSquare();
 
-    R.GetDosagefromVCFFile(validation_file, imputation_file);
-    R.CalculateRSquare();
-    R.printRSquare();
 
-
+    R.Analysis();
     return 0;
 }

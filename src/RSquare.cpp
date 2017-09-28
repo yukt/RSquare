@@ -1,27 +1,48 @@
 #include "RSquare.h"
 
-bool RSquare::GetDosagefromVCFFile(String &VCFFileName_v, String &VCFFileName_i)
+bool RSquare::GetHaplotypeFromVCF()
 {
-    DosageInfoValidation.read(VCFFileName_v);
-    DosageInfoImputation.read(VCFFileName_i);
-    FileNameValidation = DosageInfoValidation.inFileName;
-    FileNameImputation = DosageInfoImputation.inFileName;
-    DosageValidation = DosageInfoValidation.DosageData;
-    DosageImputation = DosageInfoImputation.DosageData;
-    numMarkers = DosageInfoValidation.getNumMarkers();
-    numSamples = DosageInfoValidation.getNumSamples();
+    Validation.DS = DS;
+    Imputation.DS = DS;
+    Validation.read(FileNameValidation);
+    Imputation.read(FileNameImputation);
+
+    // strcmp each markerID is need instead of simply compare numMarkers. Same for Samples.
+    if (Validation.numMarkers == Imputation.numMarkers)
+    {
+        numMarkers = Validation.numMarkers;
+        MarkerID = Validation.markerID;
+        cout << "\nValidation and Imputation the same Markers." << endl;
+    }
+    else
+    {
+        cout << "\nValidation has " << Validation.numMarkers << " Markers." << endl;
+        cout << "\nImputation has " << Imputation.numMarkers << " Markers." << endl;
+        // codes needed for matching markers.
+
+    }
+
+
+    if (Validation.numSamples == Imputation.numSamples)
+    {
+        numSamples = Validation.numSamples;
+        IndividualName = Validation.individualName;
+        cout << "\nValidation and Imputation have the same Samples." << endl;
+    }
+    else
+    {
+        cout << "\nValidation has " << Validation.numSamples << " Samples." << endl;
+        cout << "\nImputation has " << Imputation.numSamples << " Samples." << endl;
+        // codes needed for matching samples.
+    }
+
     return 0;
 }
 
 
 double RSquare::CalculateRSquare_VectorWise(vector<double> Validation, vector<double> Imputation)
 {
-    int n = (int)Validation.size();
-//    if (Imputation.size() != n)
-//    {
-//        cout << "\n Error! \n" << endl;
-//        return false;
-//    }
+    int n = int(Validation.size());
 
     double sumValidation = 0, sumValidation2 = 0, sumImputation = 0, sumImputation2 = 0, sumValidationImputation = 0;
     double EValidation, EImputation, varValidation, varImputation, covariance;
@@ -45,18 +66,19 @@ double RSquare::CalculateRSquare_VectorWise(vector<double> Validation, vector<do
 
 bool RSquare::CalculateRSquare()
 {
+    RSquareResult.resize((unsigned long)numMarkers);
 
-    vector<double>::iterator startV = DosageValidation.begin(), endV = startV + numSamples;
-    vector<double>::iterator startI = DosageImputation.begin(), endI = startI + numSamples;
+    vector<double>::iterator startV = Validation.HaplotypeData.begin(), endV = startV + numSamples;
+    vector<double>::iterator startI = Imputation.HaplotypeData.begin(), endI = startI + numSamples;
 
-    cout << "\n Calculating R-Square ..." << endl;
+    cout << "\nCalculating R-Square ..." << endl;
 
     for (int i = 0; i < numMarkers; i++)
     {
         vector<double> tempValildation(startV, endV), tempImputation(startI, endI);
 
 
-        RSquareData.push_back(CalculateRSquare_VectorWise(tempValildation, tempImputation));
+        RSquareResult[i] = CalculateRSquare_VectorWise(tempValildation, tempImputation);
         startV += numSamples; endV += numSamples;
         startI += numSamples; endI += numSamples;
 
@@ -67,9 +89,35 @@ bool RSquare::CalculateRSquare()
 
 void RSquare::printRSquare()
 {
-    for(int i = 0; i < RSquareData.size(); i++)
+    for(int i = 0; i < numMarkers; i++)
     {
-        cout << RSquareData[i] << endl;
+        cout << RSquareResult[i] << endl;
     }
 }
 
+bool RSquare::outputRSquare()
+{
+    fstream fs;
+    fs.open(FileNameOutput, ios_base::out);
+
+    fs << "MarkerID\tRSquare\n";
+
+    for (int i = 0; i < numMarkers; i++)
+    {
+        fs << MarkerID[i] << "\t" << RSquareResult[i] << "\n";
+    }
+
+    fs.close();
+
+    cout << "Success!" << endl;
+
+    return false;
+}
+
+bool RSquare::Analysis()
+{
+    GetHaplotypeFromVCF();
+    CalculateRSquare();
+    outputRSquare();
+    return false;
+}

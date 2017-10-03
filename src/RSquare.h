@@ -34,7 +34,7 @@ public:
     {
         FileNameValidation="";
         FileNameImputation="";
-        OutputPrefix="RSquareOutput";
+        OutputPrefix="";
 
     };
 

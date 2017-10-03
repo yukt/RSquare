@@ -95,26 +95,19 @@ void RSquare::printRSquare()
 bool RSquare::outputRSquare()
 {
     fstream fs;
-    fs.open(OutputPrefix, ios_base::out);
+    fs.open(OutputPrefix+"RSquareOutput", ios_base::out);
 
-    if(fs.is_open()){
-        fs << "MarkerID\tRSquare\n";
 
-        for (int i = 0; i < numMarkers; i++)
-        {
-            fs << MarkerID[i] << "\t" << RSquareResult[i] << "\n";
-        }
+    fs << "MarkerID\tRSquare\n";
 
-        fs.close();
-
-        cout << "Success! Please check RSquare result:" << OutputPrefix << endl;
-    }
-    else
+    for (int i = 0; i < numMarkers; i++)
     {
-        cout << "Error opening file." << endl;
+        fs << MarkerID[i] << "\t" << RSquareResult[i] << "\n";
     }
 
+    fs.close();
 
+    cout << "Success! Please check RSquare result:" << OutputPrefix+"RSquareOutput" << endl;
 
     return false;
 }

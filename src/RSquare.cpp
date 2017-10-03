@@ -1,3 +1,4 @@
+#include <Error.h>
 #include "RSquare.h"
 
 bool RSquare::GetHaplotypeFromVCF()
@@ -12,13 +13,11 @@ bool RSquare::GetHaplotypeFromVCF()
     {
         numMarkers = Validation.numMarkers;
         MarkerID = Validation.markerID;
-        cout << "\nValidation and Imputation the same Markers." << endl;
+//        cout << "\nValidation and Imputation the same Markers." << endl;
     }
     else
     {
-        cout << "\nValidation has " << Validation.numMarkers << " Markers." << endl;
-        cout << "\nImputation has " << Imputation.numMarkers << " Markers." << endl;
-        // codes needed for matching markers.
+        error("[Error:] Number of markers do not match in Validation and Imputation files.");
 
     }
 
@@ -27,13 +26,11 @@ bool RSquare::GetHaplotypeFromVCF()
     {
         numSamples = Validation.numSamples;
         IndividualName = Validation.individualName;
-        cout << "\nValidation and Imputation have the same Samples." << endl;
+//        cout << "\nValidation and Imputation have the same Samples." << endl;
     }
     else
     {
-        cout << "\nValidation has " << Validation.numSamples << " Samples." << endl;
-        cout << "\nImputation has " << Imputation.numSamples << " Samples." << endl;
-        // codes needed for matching samples.
+        error("[Error:] Number of samples do not match in Validation and Imputation files.");
     }
 
     return 0;
@@ -98,21 +95,30 @@ void RSquare::printRSquare()
 bool RSquare::outputRSquare()
 {
     fstream fs;
-    fs.open(FileNameOutput, ios_base::out);
+    fs.open(OutputPrefix, ios_base::out);
 
-    fs << "MarkerID\tRSquare\n";
+    if(fs.is_open()){
+        fs << "MarkerID\tRSquare\n";
 
-    for (int i = 0; i < numMarkers; i++)
+        for (int i = 0; i < numMarkers; i++)
+        {
+            fs << MarkerID[i] << "\t" << RSquareResult[i] << "\n";
+        }
+
+        fs.close();
+
+        cout << "Success! Please check RSquare result:" << OutputPrefix << endl;
+    }
+    else
     {
-        fs << MarkerID[i] << "\t" << RSquareResult[i] << "\n";
+        cout << "Error opening file." << endl;
     }
 
-    fs.close();
 
-    cout << "Success!" << endl;
 
     return false;
 }
+
 
 bool RSquare::Analysis()
 {

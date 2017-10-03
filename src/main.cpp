@@ -1,6 +1,7 @@
 #include <iostream>
 #include <getopt.h>
 #include "RSquare.h"
+#include "FileTypeCheck.h"
 
 
 
@@ -20,9 +21,10 @@ void usage(FILE *fp)
     fprintf(fp, " -------------------------------------------------------------------------------- \n");
     fprintf(fp, "     R-Square Calculator - A Tool for Calculating Imputation Accuracy R-Square  \n");
     fprintf(fp, " --------------------------------------------------------------------------------\n");
-    fprintf(fp, "\n (c) 2017 - Ketian \n");
-    fprintf(fp, "\n About:   Write a Short Description ??? \n");
-    fprintf(fp,  " URL    : Maybe Make a wiki Page for this ?\n");
+    fprintf(fp, "\n (c) 2017 - Ketian Yu \n");
+    fprintf(fp, "\n About:   This tool is used for evaluating the imputation accuracy of genotype data.\n"
+                "          For now only vcf files containing dosage data are accepted.\n");
+    fprintf(fp,  " URL  :   https://github.com/yukt/RSquare\n");
 
 
     fprintf(fp, "\n Usage:   RSquare -v [Validation.vcf.gz] // Input Validation File\n");
@@ -41,9 +43,7 @@ int main(int argc, char **argv) {
     if (argc < 2) { usage(stderr); return 1; }
     else if (strcmp(argv[1], "help") == 0 || strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h") == 0) { usage(stdout); return 0; }
 
-
-        int c;
-    String validation_file, imputation_file, output_file;
+    int c;
 
     static struct option loptions[] =
     {
@@ -58,9 +58,9 @@ int main(int argc, char **argv) {
     while ((c = getopt_long(argc, argv, "v:i:o:",loptions,NULL)) >= 0)
     {
         switch (c) {
-            case 'v': R.FileNameValidation = optarg; printf("-v with value %s\n", optarg); break;
-            case 'i': R.FileNameImputation = optarg; printf("-i with value %s\n", optarg); break;
-            case 'o': R.FileNameOutput = optarg;     printf("-o with value %s\n", optarg); break;
+            case 'v': vcfCheck(c,optarg); R.FileNameValidation = optarg; break;
+            case 'i': vcfCheck(c,optarg); R.FileNameImputation = optarg; break;
+            case 'o': outputCheck(optarg); R.OutputPrefix = optarg; break;
             case '?': usage(stderr); break;
             default: error("[ERROR:] Unknown argument: %s\n", optarg);
         }

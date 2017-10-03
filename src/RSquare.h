@@ -17,7 +17,7 @@ class RSquare{
 
 public:
 
-    String FileNameValidation, FileNameImputation, FileNameOutput;
+    String FileNameValidation, FileNameImputation, OutputPrefix;
 
     int numMarkers, numSamples;
     vector<string> IndividualName, MarkerID;
@@ -34,7 +34,7 @@ public:
     {
         FileNameValidation="";
         FileNameImputation="";
-        FileNameOutput="RsquareOutput";
+        OutputPrefix="RSquareOutput";
 
     };
 

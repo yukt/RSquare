@@ -2,6 +2,7 @@
 #include <getopt.h>
 #include "RSquare.h"
 #include "FileTypeCheck.h"
+#include "SummaryData.h"
 
 
 
@@ -54,7 +55,7 @@ int main(int argc, char **argv) {
         {NULL,0,NULL,0}
     };
 
-    RSquare R;
+    SummaryData R;
     while ((c = getopt_long(argc, argv, "v:i:o:",loptions,NULL)) >= 0)
     {
         switch (c) {
@@ -88,6 +89,6 @@ int main(int argc, char **argv) {
 
 
 
-    R.Analysis();
+    R.analysis();
     return 0;
 }

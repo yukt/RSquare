@@ -9,6 +9,7 @@
 #include <vector>
 #include <Error.h>
 #include <fstream>
+#include <sstream>
 #include "VcfFileReader.h"
 
 
@@ -20,7 +21,8 @@ class SummaryData
 public:
     String FileNameValidation, FileNameImputation, OutputPrefix;
     int numRecords, numSamples;
-    vector<string> markerID, REF, ALT;
+    vector<string> CHROM, REF, ALT;
+    vector<int>    POS;
     vector<double> RSquareData;
     vector<vector<double>> SumDat;
     // [0]sumX [1]sumY [2]sumXY [3]sumX2 [4]sumY2

@@ -1,8 +1,6 @@
 //
 // Created by Ketian Yu on 10/4/17.
 //
-#include <Error.h>
-#include <fstream>
 #include "SummaryData.h"
 #include "helperFunctions.h"
 

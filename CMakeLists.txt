@@ -5,8 +5,9 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
         src/main.cpp
-        src/RSquare.h src/RSquare.cpp
-        src/Haplotype.h src/Haplotype.cpp src/FileTypeCheck.h src/SummaryData.h src/SummaryData.cpp src/helperFunctions.h)
+        src/FileTypeCheck.h
+        src/SummaryData.h src/SummaryData.cpp
+        src/helperFunctions.h)
 find_package(ZLIB REQUIRED)
 find_library(STATGEN_LIBRARY StatGen)
 

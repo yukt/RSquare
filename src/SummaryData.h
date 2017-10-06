@@ -7,7 +7,10 @@
 
 #include <string>
 #include <vector>
+#include <Error.h>
+#include <fstream>
 #include "VcfFileReader.h"
+
 
 
 using namespace std;

@@ -1,6 +1,5 @@
 #include <iostream>
 #include <getopt.h>
-#include "RSquare.h"
 #include "FileTypeCheck.h"
 #include "SummaryData.h"
 
@@ -69,24 +68,6 @@ int main(int argc, char **argv) {
 
     if(R.FileNameValidation =="") { error("[ERROR:] Missing Mandatory argument -v: %s\n");}
     if(R.FileNameImputation =="") { error("[ERROR:] Missing Mandatory argument -i: %s\n");}
-
-
-//    Dosage DosageData;
-//    DosageData.read(validation_file);
-//    cout << 7*1.0/2 << endl;
-
-//    double n[] = {1,2,3,4,5}, m[] = {5,3,6,3,1};
-//    vector<double> v1(n, n+5), v2(m,m+5);
-//
-//    RSquare R;
-//    cout << "\n" << R.CalculateRSquare_VectorWise(v1,v2) << endl;
-
-//
-//    R.GetDosagefromVCFFile(validation_file, imputation_file);
-//    R.CalculateRSquare();
-//    R.printRSquare();
-
-
 
 
     R.analysis();

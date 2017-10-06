@@ -2,12 +2,14 @@
 // Created by Ketian Yu on 10/3/17.
 //
 
-#include <Error.h>
+#include "SummaryData.h"
 
 #ifndef RSQUARE_FILETYPECHECK_H
 #define RSQUARE_FILETYPECHECK_H
 
 #endif //RSQUARE_FILETYPECHECK_H
+
+using namespace std;
 
 bool vcfCheck(int option, String filename)
 {

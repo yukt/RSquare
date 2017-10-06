@@ -21,8 +21,8 @@ public:
     String FileNameValidation, FileNameImputation, OutputPrefix;
     int numRecords, numSamples;
     vector<string> markerID, REF, ALT;
-    vector<vector<double>> SumDat;
     vector<double> RSquareData;
+    vector<vector<double>> SumDat;
     // [0]sumX [1]sumY [2]sumXY [3]sumX2 [4]sumY2
 
     SummaryData()

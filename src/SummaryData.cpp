@@ -10,7 +10,6 @@ bool SummaryData::read()
     VcfFileReader   inFileV, inFileI;
     VcfHeader       headerV, headerI;
     VcfRecord       recordV, recordI;
-    VcfRecord       curV, curI;
     int             chrV, chrI, posV, posI;
 
     vector<String>        TempAltV;

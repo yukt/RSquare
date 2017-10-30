@@ -6,7 +6,7 @@
 
 bool SummaryData::read()
 {
-    const int       MAXNUM = 100000;
+    const int       MAXNUM = 10000000;
 //    const int       MAXNUM_SAME_POS = 100;
     VcfFileReader   inFileV, inFileI;
     VcfHeader       headerV, headerI;
@@ -68,8 +68,10 @@ bool SummaryData::read()
         }
 
         numRecords++;
+//        cout << numRecords << endl;
 
     }
+    cout << "Finish reading " << numRecords << " Common Records." << endl;
 
     SumDat.resize(numRecords); CHROM.resize(numRecords); POS.resize(numRecords); REF.resize(numRecords); ALT.resize(numRecords);
 

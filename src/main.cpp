@@ -51,16 +51,20 @@ int main(int argc, char **argv) {
         {"validation",  required_argument,  NULL, 'v'},
         {"imputation",  required_argument,  NULL, 'i'},
         {"output",  required_argument,  NULL, 'o'},
+        {"validationFormat", required_argument, NULL, 'f'},
+        {"imputationFormat", required_argument, NULL, 'g'},
         {NULL,0,NULL,0}
     };
 
     SummaryData R;
-    while ((c = getopt_long(argc, argv, "v:i:o:",loptions,NULL)) >= 0)
+    while ((c = getopt_long(argc, argv, "v:i:o:g:h:d:e",loptions,NULL)) >= 0)
     {
         switch (c) {
             case 'v': vcfCheck(c,optarg); R.FileNameValidation = optarg; break;
             case 'i': vcfCheck(c,optarg); R.FileNameImputation = optarg; break;
             case 'o': outputCheck(optarg); R.OutputPrefix = optarg; break;
+            case 'f': formatCheck(c, optarg); R.validationFormat = optarg; break;
+            case 'g': formatCheck(c, optarg); R.imputationFormat = optarg; break;
             case '?': usage(stderr); break;
             default: error("[ERROR:] Unknown argument: %s\n", optarg);
         }

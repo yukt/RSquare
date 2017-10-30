@@ -79,3 +79,13 @@ bool outputCheck(String filename)
     }
     return false;
 }
+
+bool formatCheck(int option, String format)
+{
+    if(format!="DS" and format!="GT")
+    {
+        if(option == 'f')      error("[ERROR:] Invalid argument --validationFormat %s", format.c_str());
+        else if(option == 'g') error("[ERROR:] Invalid argument --imputationFormat %s", format.c_str());
+    }
+    return false;
+}

@@ -8,6 +8,19 @@
 #include <StringBasics.h>
 #include "VcfFileReader.h"
 
+double info2ds(VcfRecordGenotype& Genotype, string format, int i)
+{
+    if (format == "DS") return stod(*Genotype.getString("DS", i));
+    else if (format == "GT"){
+        string info = *Genotype.getString("GT", i);
+        double dosage = 0;
+        for (int j = 0; j < info.size(); j++) if(info[j]=='1') dosage++;
+        return dosage;
+    }
+    else
+        return -1;
+}
+
 int chr2int(String chr)
 {
     if(chr == "X") { return 23; }

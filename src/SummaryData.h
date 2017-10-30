@@ -26,6 +26,7 @@ public:
     vector<double> RSquareData;
     vector<vector<double>> SumDat;
     // [0]sumX [1]sumY [2]sumXY [3]sumX2 [4]sumY2
+    string validationFormat = "GT", imputationFormat = "DS";
 
     SummaryData()
     {
@@ -42,6 +43,7 @@ public:
     bool   analysis();
     double vectorwiseRSquare( vector<int> index );
     bool   RSquare();
+    void   printRSquare();
     bool   output();
 
 

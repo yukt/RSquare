@@ -2,7 +2,7 @@
 // Created by Ketian Yu on 10/4/17.
 //
 #include "SummaryData.h"
-//#include "helperFunctions.h"
+#include "helperFunctions.h"
 
 bool SummaryData::read()
 {
@@ -45,6 +45,7 @@ bool SummaryData::read()
         if (markerV != markerI)
             continue;
 
+        // Now the markers of records match.
         CHROM[numRecords] = recordI.getChromStr();
         POS[numRecords]   = recordI.get1BasedPosition();
         REF[numRecords]   = recordI.getRefStr();
@@ -58,8 +59,11 @@ bool SummaryData::read()
 
         for (int i = 0; i < numSamples; i++)
         {
-            double X = stod(*GenotypeV.getString("DS",i));
-            double Y = stod(*GenotypeI.getString("DS",i));
+//            cout << info2ds(GenotypeV,"GT",i) << "\t" << *GenotypeV.getString("GT",i) << "\t" << *GenotypeV.getString("DS",i) << endl;
+//            double X = stod(*GenotypeV.getString("DS",i));
+//            double Y = stod(*GenotypeI.getString("DS",i));
+            double X = info2ds(GenotypeV, validationFormat, i);
+            double Y = info2ds(GenotypeI, imputationFormat, i);
             temp[0] += X; temp[1] += Y; temp[2] += X*Y; temp[3] += X*X; temp[4] += Y*Y;
         }
 
@@ -231,9 +235,10 @@ void SummaryData::printData()
 bool SummaryData::analysis()
 {
     read();
-    printData();
-//    RSquare();
-//    output();
+//    printData();
+    RSquare();
+//    printRSquare();
+    output();
 
     return false;
 }
@@ -274,6 +279,14 @@ bool SummaryData::RSquare()
         RSquareData[i] = vectorwiseRSquare({i});
     }
     return false;
+}
+
+void SummaryData::printRSquare()
+{
+    cout << "CHROM\tPOS\tREF\tALT\tRSquare\n";
+    for (int i = 0; i < numRecords; i++){
+        cout << CHROM[i] << "\t" << POS[i] << "\t" << REF[i] << "\t" << ALT[i] << "\t" << RSquareData[i] << "\n";
+    }
 }
 
 bool SummaryData::output()

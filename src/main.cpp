@@ -23,13 +23,13 @@ void usage(FILE *fp)
     fprintf(fp, " --------------------------------------------------------------------------------\n");
     fprintf(fp, "\n (c) 2017 - Ketian Yu \n");
     fprintf(fp, "\n About:   This tool is used for evaluating the imputation accuracy of genotype data.\n"
-                "          For now only vcf files containing dosage data are accepted.\n");
+                "          Note vcf file of imputed genotype data should include dosage information.\n");
     fprintf(fp,  " URL  :   https://github.com/yukt/RSquare\n");
 
 
-    fprintf(fp, "\n Usage:   RSquare -v [Validation.vcf.gz] // Input Validation File\n");
-    fprintf(fp, "                  -i [Imputed.vcf.gz]    // Input Imputed Dosage File\n");
-    fprintf(fp, "                  -o [RsquareOutput]     // Output Prefix\n");
+    fprintf(fp, "\n Usage:   RSquare -v [Validation.vcf.gz]         // Input Validation File\n");
+    fprintf(fp, "                  -i [Imputed.vcf.gz]            // Input Imputed Dosage File\n");
+    fprintf(fp, "                  -o [RsquareOutput]             // Output Prefix\n");
     fprintf(fp, "                  --validationFormat [GT/DS]     // Default: GT\n");
     fprintf(fp, "                  --imputationFormat [GT/DS]     // Default: DS\n");
     fprintf(fp, "\n\n");

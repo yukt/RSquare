@@ -30,6 +30,8 @@ void usage(FILE *fp)
     fprintf(fp, "\n Usage:   RSquare -v [Validation.vcf.gz] // Input Validation File\n");
     fprintf(fp, "                  -i [Imputed.vcf.gz]    // Input Imputed Dosage File\n");
     fprintf(fp, "                  -o [RsquareOutput]     // Output Prefix\n");
+    fprintf(fp, "                  --validationFormat [GT/DS]     // Default: GT\n");
+    fprintf(fp, "                  --imputationFormat [GT/DS]     // Default: DS\n");
     fprintf(fp, "\n\n");
     exit(1);
 

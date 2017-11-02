@@ -31,10 +31,10 @@ bool SummaryData::read()
     SumDat.resize(maxNum); CHROM.resize(maxNum); POS.resize(maxNum); REF.resize(maxNum); ALT.resize(maxNum);
     numRecords = 0;
 
-    while (inFileV.readRecord(recordV))
+    while (inFileI.readRecord(recordI))
     {
-        while (inFileI.readRecord(recordI) && recordI.get1BasedPosition() < recordV.get1BasedPosition());
-        if    (recordV.get1BasedPosition() <  recordI.get1BasedPosition())
+        while (inFileV.readRecord(recordV) && recordV.get1BasedPosition() < recordI.get1BasedPosition());
+        if    (recordI.get1BasedPosition() <  recordV.get1BasedPosition())
             continue;
 
         stringstream ssV, ssI;
@@ -50,8 +50,8 @@ bool SummaryData::read()
         POS[numRecords]   = recordI.get1BasedPosition();
         REF[numRecords]   = recordI.getRefStr();
         ALT[numRecords]   = recordI.getAltStr();
-        SumDat[numRecords].resize(5,0);
-        // [0]sumX [1]sumY [2]sumXY [3]sumX2 [4]sumY2
+        SumDat[numRecords].resize(6,0);
+        // [0]sumX [1]sumY [2]sumXY [3]sumX2 [4]sumY2 [5]n
 
         VcfRecordGenotype& GenotypeV = recordV.getGenotypeInfo();
         VcfRecordGenotype& GenotypeI = recordI.getGenotypeInfo();
@@ -59,9 +59,11 @@ bool SummaryData::read()
 
         for (int i = 0; i < numSamples; i++)
         {
-            double X = info2ds(GenotypeV, validationFormat, i);
-            double Y = info2ds(GenotypeI, imputationFormat, i);
-            temp[0] += X; temp[1] += Y; temp[2] += X*Y; temp[3] += X*X; temp[4] += Y*Y;
+            double X = getGT(GenotypeV, i);
+            double Y = getDS(GenotypeI, i);
+            if (X>=0 and Y>=0){
+                temp[0] += X; temp[1] += Y; temp[2] += X*Y; temp[3] += X*X; temp[4] += Y*Y; temp[5]++;
+            }
         }
 
         numRecords++;
@@ -99,12 +101,14 @@ bool SummaryData::analysis()
     return false;
 }
 
-double SummaryData::vectorwiseRSquare(vector<int> index)
+vector<double> SummaryData::vectorwiseRSquare(vector<int> index)
 {
+    vector<double> result;
+    result.resize(3);
+
     double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
     double EX, EY, varX, varY, cov;
-
-    int n = numSamples*int(index.size());
+    int n = 0;
 
     for (int i: index)
     {
@@ -114,6 +118,7 @@ double SummaryData::vectorwiseRSquare(vector<int> index)
         sumXY += temp[2];
         sumX2 += temp[3];
         sumY2 += temp[4];
+        n     += temp[5];
     }
 
     EX   = sumX *1.0/n;
@@ -122,7 +127,10 @@ double SummaryData::vectorwiseRSquare(vector<int> index)
     varY = sumY2*1.0/n - EY*EY;
     cov  = sumXY*1.0/n - EX*EY;
 
-    return 1.0*cov/varX*cov/varY;
+    result[0] = n;
+    result[1] = EX*0.5;
+    result[2] = 1.0*cov/varX*cov/varY;
+    return result;
 
 }
 
@@ -139,9 +147,11 @@ bool SummaryData::RSquare()
 
 void SummaryData::printRSquare()
 {
-    cout << "CHROM\tPOS\tREF\tALT\tRSquare\n";
+    cout << "SNP\tnumObsGeno\tGoldFreq\tRSquare\n";
     for (int i = 0; i < numRecords; i++){
-        cout << CHROM[i] << "\t" << POS[i] << "\t" << REF[i] << "\t" << ALT[i] << "\t" << RSquareData[i] << "\n";
+        vector<double> &temp = RSquareData[i];
+        cout << CHROM[i] << ":" << POS[i] << ":" << REF[i] << ":" << ALT[i] << "\t";
+        cout << temp[0] << "\t" << temp[1] << "\t" << temp[2] << "\n";
     }
 }
 
@@ -151,11 +161,13 @@ bool SummaryData::output()
     fs.open(OutputPrefix+"RSquareOutput", ios_base::out);
 
 
-    fs << "CHROM\tPOS\tREF\tALT\tRSquare\n";
+    fs << "SNP\tnumObsGeno\tGoldFreq\tRSquare\n";
 
     for (int i = 0; i < numRecords; i++)
     {
-        fs << CHROM[i] << "\t" << POS[i] << "\t" << REF[i] << "\t" << ALT[i] << "\t" << RSquareData[i] << "\n";
+        vector<double> &temp = RSquareData[i];
+        fs << CHROM[i] << ":" << POS[i] << ":" << REF[i] << ":" << ALT[i] << "\t";
+        fs << temp[0] << "\t" << temp[1] << "\t" << temp[2] << "\n";
     }
 
     fs.close();
@@ -163,4 +175,20 @@ bool SummaryData::output()
     cout << "Success! Please check RSquare result:" << OutputPrefix+"RSquareOutput" << endl;
 
     return false;
+}
+
+double SummaryData::getGT(VcfRecordGenotype& Genotype, int i)
+{
+    string info = *Genotype.getString("GT", i);
+    if (info == ".") return -1;
+    double dosage = 0;
+    for (char j : info) if( j =='1' ) dosage++;
+    return dosage;
+}
+
+double SummaryData::getDS(VcfRecordGenotype& Genotype, int i)
+{
+    string info = *Genotype.getString("DS", i);
+    if (info == ".") return -1;
+    return stod(info);
 }

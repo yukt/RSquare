@@ -23,7 +23,8 @@ public:
     int numRecords, numSamples;
     vector<string> CHROM, REF, ALT;
     vector<int>    POS;
-    vector<double> RSquareData;
+    vector<vector<double>> RSquareData;
+    // [0]numObsGeno   [1]GoldFreq  [2]RSquare
     vector<vector<double>> SumDat;
     // [0]sumX [1]sumY [2]sumXY [3]sumX2 [4]sumY2
     string validationFormat = "GT", imputationFormat = "DS";
@@ -41,10 +42,13 @@ public:
     bool   read();
     void   printData();
     bool   analysis();
-    double vectorwiseRSquare( vector<int> index );
+    vector<double> vectorwiseRSquare( vector<int> index );
     bool   RSquare();
     void   printRSquare();
     bool   output();
+
+    double getGT(VcfRecordGenotype& Genotype, int i);
+    double getDS(VcfRecordGenotype& Genotype, int i);
 
 
 };

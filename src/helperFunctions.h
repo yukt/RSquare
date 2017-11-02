@@ -8,18 +8,22 @@
 #include <StringBasics.h>
 #include "VcfFileReader.h"
 
-double info2ds(VcfRecordGenotype& Genotype, string format, int i)
+double readGT(VcfRecordGenotype& Genotype, int i)
 {
-    if (format == "DS") return stod(*Genotype.getString("DS", i));
-    else if (format == "GT"){
-        string info = *Genotype.getString("GT", i);
-        double dosage = 0;
-        for (int j = 0; j < info.size(); j++) if(info[j]=='1') dosage++;
-        return dosage;
-    }
-    else
-        return -1;
+    string info = *Genotype.getString("GT", i);
+    if (info == ".") return -1;
+    double dosage = 0;
+    for (char j : info) if( j =='1' ) dosage++;
+    return dosage;
 }
+
+double readDS(VcfRecordGenotype& Genotype, int i)
+{
+    string info = *Genotype.getString("DS", i);
+    if (info == ".") return -1;
+    return stod(info);
+}
+
 
 int chr2int(String chr)
 {

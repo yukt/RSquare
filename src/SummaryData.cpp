@@ -20,6 +20,11 @@ bool SummaryData::read()
         error("[Error: ] Number of samples do NOT match!");
     }
 
+    double (*getDosageV) (VcfRecordGenotype&, int ) = &readGT;
+    double (*getDosageI) (VcfRecordGenotype&, int ) = &readDS;
+    if (validationFormat == "DS") { getDosageV = &readDS; }
+    if (imputationFormat == "GT") { getDosageI = &readGT; }
+
     cout << "Reading VCFfiles ..." << endl;
     numSamples = headerV.getNumSamples();
 
@@ -59,8 +64,8 @@ bool SummaryData::read()
 
         for (int i = 0; i < numSamples; i++)
         {
-            double X = getGT(GenotypeV, i);
-            double Y = getDS(GenotypeI, i);
+            double X = (*getDosageV)(GenotypeV, i);
+            double Y = (*getDosageI)(GenotypeI, i);
             if (X>=0 and Y>=0){
                 temp[0] += X; temp[1] += Y; temp[2] += X*Y; temp[3] += X*X; temp[4] += Y*Y; temp[5]++;
             }
@@ -175,20 +180,4 @@ bool SummaryData::output()
     cout << "Success! Please check RSquare result:" << OutputPrefix+"RSquareOutput" << endl;
 
     return false;
-}
-
-double SummaryData::getGT(VcfRecordGenotype& Genotype, int i)
-{
-    string info = *Genotype.getString("GT", i);
-    if (info == ".") return -1;
-    double dosage = 0;
-    for (char j : info) if( j =='1' ) dosage++;
-    return dosage;
-}
-
-double SummaryData::getDS(VcfRecordGenotype& Genotype, int i)
-{
-    string info = *Genotype.getString("DS", i);
-    if (info == ".") return -1;
-    return stod(info);
 }

@@ -47,9 +47,6 @@ public:
     void   printRSquare();
     bool   output();
 
-    double getGT(VcfRecordGenotype& Genotype, int i);
-    double getDS(VcfRecordGenotype& Genotype, int i);
-
 
 };
 

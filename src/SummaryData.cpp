@@ -7,7 +7,6 @@
 
 bool SummaryData::read()
 {
-//    const int       MAXNUM = 10000000;
     VcfFileReader   inFileV, inFileI;
     VcfHeader       headerV, headerI;
     VcfRecord       recordV, recordI;
@@ -34,7 +33,7 @@ bool SummaryData::read()
     inFileI.close();
     inFileI.open(FileNameImputation, headerI);
 
-    SumDat.resize(maxNum); CHROM.resize(maxNum); POS.resize(maxNum); REF.resize(maxNum); ALT.resize(maxNum);
+    SumDat.resize(maxNum); SNP.resize(maxNum);
     numRecords = 0;
 
     while (inFileI.readRecord(recordI))
@@ -46,16 +45,13 @@ bool SummaryData::read()
         stringstream ssV, ssI;
         ssV << recordV.get1BasedPosition(); ssI << recordI.get1BasedPosition();
 
-        string markerV = ssV.str() + "_" + recordV.getRefStr() + "_" + recordV.getAltStr();
-        string markerI = ssI.str() + "_" + recordI.getRefStr() + "_" + recordI.getAltStr();
+        string markerV = ssV.str()+":"+recordV.getRefStr()+":"+recordV.getAltStr();
+        string markerI = ssI.str()+":"+recordV.getRefStr()+":"+recordV.getAltStr();
         if (markerV != markerI)
             continue;
 
         // Now the markers of records match.
-        CHROM[numRecords] = recordI.getChromStr();
-        POS[numRecords]   = recordI.get1BasedPosition();
-        REF[numRecords]   = recordI.getRefStr();
-        ALT[numRecords]   = recordI.getAltStr();
+        SNP[numRecords] = string(recordV.getChromStr())+":"+markerI;
         SumDat[numRecords].resize(6,0);
         // [0]sumX [1]sumY [2]sumXY [3]sumX2 [4]sumY2 [5]n
 
@@ -78,9 +74,8 @@ bool SummaryData::read()
     }
     cout << "Finish reading " << numRecords << " Common Records." << endl;
 
-    SumDat.resize(numRecords); CHROM.resize(numRecords); POS.resize(numRecords); REF.resize(numRecords); ALT.resize(numRecords);
-
-
+    SumDat.resize(numRecords); SNP.resize(numRecords);
+    inFileI.close(); inFileV.close();
     return false;
 }
 
@@ -88,7 +83,7 @@ void SummaryData::printData()
 {
     for (int i = 0; i < numRecords; i++)
     {
-        cout << i << "\t" << CHROM[i] << "\t" << POS[i] << "\t" << REF[i] << "\t" << ALT[i] << "\t";
+        cout << i << "\t" << SNP[i] << "\t";
         vector<double> &temp = SumDat[i];
         for (int j = 0; j < 5; j++)
             cout << temp[j] << "\t";
@@ -127,14 +122,24 @@ vector<double> SummaryData::vectorwiseRSquare(vector<int> index)
         n     += temp[5];
     }
 
+    result[0] = n;
+    if (n == 0){
+        result[1] = result[2] = 0;
+        return result;
+    }
+
     EX   = sumX *1.0/n;
+    result[1] = EX;
+    if (EX == 0){
+        result[2] = 0;
+        return result;
+    }
+
     EY   = sumY *1.0/n;
     varX = sumX2*1.0/n - EX*EX;
     varY = sumY2*1.0/n - EY*EY;
     cov  = sumXY*1.0/n - EX*EY;
 
-    result[0] = n;
-    result[1] = EX*0.5;
     result[2] = 1.0*cov/varX*cov/varY;
     return result;
 
@@ -156,7 +161,7 @@ void SummaryData::printRSquare()
     cout << "SNP\tnumObsGeno\tGoldFreq\tRSquare\n";
     for (int i = 0; i < numRecords; i++){
         vector<double> &temp = RSquareData[i];
-        cout << CHROM[i] << ":" << POS[i] << ":" << REF[i] << ":" << ALT[i] << "\t";
+        cout << SNP[i] << "\t";
         cout << setprecision(6) << temp[0] << "\t" << temp[1] << "\t" << temp[2] << "\n";
     }
 }
@@ -171,13 +176,13 @@ bool SummaryData::output()
     for (int i = 0; i < numRecords; i++)
     {
         vector<double> &temp = RSquareData[i];
-        fs << CHROM[i] << ":" << POS[i] << ":" << REF[i] << ":" << ALT[i] << "\t";
+        fs << SNP[i] << "\t";
         fs << (int)temp[0] << "\t" << temp[1] << "\t" << temp[2] << "\n";
     }
 
     fs.close();
 
-    cout << "Success! Please check RSquare result:" << OutputPrefix+".RSquareOutput" << endl;
+    cout << "Success! Please check RSquare result: " << OutputPrefix+".RSquareOutput" << endl;
 
     return false;
 }

@@ -21,17 +21,17 @@ class SummaryData
 public:
     String FileNameValidation, FileNameImputation, OutputPrefix;
     int numRecords, numSamples;
-    vector<string> CHROM, REF, ALT;
-    vector<int>    POS;
+    vector<string> SNP;
     vector<vector<double>> RSquareData;
     // [0]numObsGeno   [1]GoldFreq  [2]RSquare
     vector<vector<double>> SumDat;
-    // [0]sumX [1]sumY [2]sumXY [3]sumX2 [4]sumY2
-    string validationFormat = "GT", imputationFormat = "DS";
+    // [0]sumX [1]sumY [2]sumXY [3]sumX2 [4]sumY2 [5]n
+    string validationFormat, imputationFormat;
 
     SummaryData()
     {
-
+        validationFormat = "GT";
+        imputationFormat = "DS";
     };
 
     ~SummaryData()
@@ -42,10 +42,12 @@ public:
     bool   read();
     void   printData();
     bool   analysis();
-    vector<double> vectorwiseRSquare( vector<int> index );
     bool   RSquare();
     void   printRSquare();
     bool   output();
+
+private:
+    vector<double> vectorwiseRSquare( vector<int> index );
 
 
 };

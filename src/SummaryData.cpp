@@ -3,6 +3,7 @@
 //
 #include "SummaryData.h"
 #include "helperFunctions.h"
+#include <iomanip>
 
 bool SummaryData::read()
 {
@@ -156,28 +157,27 @@ void SummaryData::printRSquare()
     for (int i = 0; i < numRecords; i++){
         vector<double> &temp = RSquareData[i];
         cout << CHROM[i] << ":" << POS[i] << ":" << REF[i] << ":" << ALT[i] << "\t";
-        cout << temp[0] << "\t" << temp[1] << "\t" << temp[2] << "\n";
+        cout << setprecision(6) << temp[0] << "\t" << temp[1] << "\t" << temp[2] << "\n";
     }
 }
 
 bool SummaryData::output()
 {
     fstream fs;
-    fs.open(OutputPrefix+"RSquareOutput", ios_base::out);
-
-
+    fs.open(OutputPrefix+".RSquareOutput", ios_base::out);
+    fs << std::fixed << std::setprecision(6);
     fs << "SNP\tnumObsGeno\tGoldFreq\tRSquare\n";
 
     for (int i = 0; i < numRecords; i++)
     {
         vector<double> &temp = RSquareData[i];
         fs << CHROM[i] << ":" << POS[i] << ":" << REF[i] << ":" << ALT[i] << "\t";
-        fs << temp[0] << "\t" << temp[1] << "\t" << temp[2] << "\n";
+        fs << (int)temp[0] << "\t" << temp[1] << "\t" << temp[2] << "\n";
     }
 
     fs.close();
 
-    cout << "Success! Please check RSquare result:" << OutputPrefix+"RSquareOutput" << endl;
+    cout << "Success! Please check RSquare result:" << OutputPrefix+".RSquareOutput" << endl;
 
     return false;
 }

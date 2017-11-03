@@ -68,7 +68,7 @@ bool vcfCheck(int option, String filename)
 
 bool outputCheck(String filename)
 {
-    fstream fs(filename+"RSquareOutput", ios_base::out);
+    fstream fs(filename+".RSquareOutput", ios_base::out);
     if(fs.is_open())
     {
         fs.close();

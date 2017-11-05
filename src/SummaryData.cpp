@@ -146,17 +146,16 @@ vector<double> SummaryData::vectorwiseRSquare(vector<int> index)
     }
 
     EX   = sumX *1.0/n;
-    result[1] = EX;
-    if (EX == 0){
-        result[2] = 0;
-        return result;
-    }
-
     EY   = sumY *1.0/n;
     varX = sumX2*1.0/n - EX*EX;
     varY = sumY2*1.0/n - EY*EY;
     cov  = sumXY*1.0/n - EX*EY;
 
+    result[1] = EX*0.5;
+    if (varX == 0 or varY == 0){
+        result[2] = 0;
+        return result;
+    }
     result[2] = 1.0*cov/varX*cov/varY;
     return result;
 

@@ -52,12 +52,12 @@ int main(int argc, char **argv) {
     static struct option loptions[] =
     {
 
-        {"validation",       required_argument, NULL,            'v'},
-        {"imputation",       required_argument, NULL,            'i'},
-        {"output",           required_argument, NULL,            'o'},
-        {"validationFormat", required_argument, NULL,            'f'},
-        {"imputationFormat", required_argument, NULL,            'g'},
-        {"AF",               required_argument, NULL,            'a'},
+        {"validation",       required_argument, NULL, 'v'},
+        {"imputation",       required_argument, NULL, 'i'},
+        {"output",           required_argument, NULL, 'o'},
+        {"validationFormat", required_argument, NULL, 'f'},
+        {"imputationFormat", required_argument, NULL, 'g'},
+        {"AF",               required_argument, NULL, 'a'},
         {NULL,0,NULL,0}
     };
 

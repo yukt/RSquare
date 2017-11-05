@@ -89,3 +89,22 @@ bool formatCheck(int option, String format)
     }
     return false;
 }
+
+bool AFCheck(String filename)
+{
+    fstream fs(filename, ios_base::in);
+    if(fs.is_open())
+    {
+        string header;
+        getline(fs, header);
+        if (header!="CHROM\tPOS\tREF\tALT\tAF")
+            error("[ERROR:] Please check the format of AlleleFrequency file --AF: %s", filename.c_str());
+        fs.close();
+    }
+    else
+    {
+        error("[ERROR:] Allele Frequency file does not exist --AF: %s", filename.c_str());
+    }
+    return false;
+
+}

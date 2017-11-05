@@ -19,7 +19,7 @@ using namespace std;
 class SummaryData
 {
 public:
-    String FileNameValidation, FileNameImputation, OutputPrefix;
+    String FileNameValidation, FileNameImputation, OutputPrefix, FileAF;
     int numRecords, numSamples;
     vector<string> SNP;
     vector<vector<double>> RSquareData;

@@ -4,12 +4,14 @@
 #include "SummaryData.h"
 #include "helperFunctions.h"
 #include <iomanip>
+#include <ctime>
 
 bool SummaryData::read()
 {
     VcfFileReader   inFileV, inFileI;
     VcfHeader       headerV, headerI;
     VcfRecord       recordV, recordI;
+    int             posV,chrV,posI,chrI;
 
     inFileV.open(FileNameValidation, headerV);
     inFileI.open(FileNameImputation, headerI);
@@ -36,22 +38,25 @@ bool SummaryData::read()
     SumDat.resize(maxNum); SNP.resize(maxNum);
     numRecords = 0;
 
-    while (inFileI.readRecord(recordI))
+    bool EndRecord = !inFileV.readRecord(recordV); chrV = chr2int(recordV.getChromStr());
+    while (inFileI.readRecord(recordI) & !EndRecord)
     {
-        while (inFileV.readRecord(recordV) && recordV.get1BasedPosition() < recordI.get1BasedPosition());
-        if    (recordI.get1BasedPosition() <  recordV.get1BasedPosition())
-            continue;
+        chrI = chr2int(recordI.getChromStr());
+        while ((chrV<chrI) & !EndRecord) {EndRecord = !inFileV.readRecord(recordV); chrV = chr2int(recordV.getChromStr());}
+        if    (chrV > chrI) continue;
 
-        stringstream ssV, ssI;
-        ssV << recordV.get1BasedPosition(); ssI << recordI.get1BasedPosition();
+        posI = recordI.get1BasedPosition(); posV = recordV.get1BasedPosition();
+        while ((posV<posI) & !EndRecord) {EndRecord = !inFileV.readRecord(recordV); chrV = chr2int(recordV.getChromStr()); posV = recordV.get1BasedPosition();}
+        if    (chrV > chrI or posV > posI) continue;
 
-        string markerV = ssV.str()+":"+recordV.getRefStr()+":"+recordV.getAltStr();
-        string markerI = ssI.str()+":"+recordV.getRefStr()+":"+recordV.getAltStr();
+        stringstream ssV, ssI; ssV << posV; ssI << posI;
+        string markerV = string(recordV.getChromStr()) + ":" + ssV.str()+":"+recordV.getRefStr()+":"+recordV.getAltStr();
+        string markerI = string(recordI.getChromStr()) + ":" + ssI.str()+":"+recordV.getRefStr()+":"+recordV.getAltStr();
         if (markerV != markerI)
             continue;
 
         // Now the markers of records match.
-        SNP[numRecords] = string(recordV.getChromStr())+":"+markerI;
+        SNP[numRecords] = markerI;
         SumDat[numRecords].resize(6,0);
         // [0]sumX [1]sumY [2]sumXY [3]sumX2 [4]sumY2 [5]n
 
@@ -93,11 +98,23 @@ void SummaryData::printData()
 
 bool SummaryData::analysis()
 {
+    time_t  startTime, endTime;
+    struct tm * timeinfo;
+
+    time(&startTime);
+
     read();
 //    printData();
     RSquare();
 //    printRSquare();
     output();
+
+    time(&endTime);
+    timeinfo = localtime (&endTime);
+    double secondPassed = difftime(endTime,startTime);
+    cout << "[INFO]	Analyzed [ " << numRecords << " ] SNPs" << endl;
+    cout << "[INFO]	Analysis ends at: " <<  asctime(timeinfo);
+    cout << "[INFO]	Analysis took " << secondPassed << " seconds" << endl;
 
     return false;
 }

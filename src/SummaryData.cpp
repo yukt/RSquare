@@ -151,7 +151,7 @@ vector<double> SummaryData::vectorwiseRSquare(vector<int> index)
     varY = sumY2*1.0/n - EY*EY;
     cov  = sumXY*1.0/n - EX*EY;
 
-    result[1] = min(EX,1-EX)*0.5;
+    result[1] = min(EX,2-EX)*0.5;
     if (varX == 0 or varY == 0){
         result[2] = 0;
         return result;

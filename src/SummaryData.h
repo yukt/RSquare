@@ -20,13 +20,22 @@ class SummaryData
 {
 public:
     String FileNameValidation, FileNameImputation, OutputPrefix, FileAF;
+    string validationFormat, imputationFormat;
     int numRecords, numSamples;
+    int NumMax;
+
+    // RSquare results:
     vector<string> SNP;
     vector<vector<double>> RSquareData;
     // [0]numObsGeno   [1]GoldFreq  [2]RSquare
     vector<vector<double>> SumDat;
     // [0]sumX [1]sumY [2]sumXY [3]sumX2 [4]sumY2 [5]n
-    string validationFormat, imputationFormat;
+
+
+    // for aggregate use:
+    vector <int> commonIndex;
+    vector <vector<int>> aggregateIndex;
+    vector <vector<double>> aggregateRSquare;
 
     SummaryData()
     {
@@ -39,12 +48,17 @@ public:
 
     };
 
+    bool   sampleCheck();
+    bool   loadNumMax();
+    bool   loadAlleleFreq();
     bool   read();
     void   printData();
     bool   analysis();
     bool   RSquare();
     void   printRSquare();
     bool   output();
+    bool   aggregate();
+    bool   outputAggregate();
 
 private:
     vector<double> vectorwiseRSquare( vector<int> index );

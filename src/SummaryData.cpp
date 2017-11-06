@@ -16,31 +16,21 @@ bool SummaryData::read()
     inFileV.open(FileNameValidation, headerV);
     inFileI.open(FileNameImputation, headerI);
 
-    // check samples.
-    if (headerI.getNumSamples() != headerV.getNumSamples())
-    {
-        error("[Error: ] Number of samples do NOT match!");
-    }
-
     double (*getDosageV) (VcfRecordGenotype&, int ) = &readGT;
     double (*getDosageI) (VcfRecordGenotype&, int ) = &readDS;
     if (validationFormat == "DS") { getDosageV = &readDS; }
     if (imputationFormat == "GT") { getDosageI = &readGT; }
 
     cout << "Reading VCFfiles ..." << endl;
-    numSamples = headerV.getNumSamples();
 
-    unsigned long maxNum = 0;
-    while (inFileI.readRecord(recordI)) { maxNum++; }
-    inFileI.close();
-    inFileI.open(FileNameImputation, headerI);
-
-    SumDat.resize(maxNum); SNP.resize(maxNum);
+    SumDat.resize(NumMax); SNP.resize(NumMax); commonIndex.resize(NumMax);
     numRecords = 0;
 
     bool EndRecord = !inFileV.readRecord(recordV); chrV = chr2int(recordV.getChromStr());
+    int index = -1;
     while (inFileI.readRecord(recordI) & !EndRecord)
     {
+        index++;
         chrI = chr2int(recordI.getChromStr());
         while ((chrV<chrI) & !EndRecord) {EndRecord = !inFileV.readRecord(recordV); chrV = chr2int(recordV.getChromStr());}
         if    (chrV > chrI) continue;
@@ -72,15 +62,45 @@ bool SummaryData::read()
                 temp[0] += X; temp[1] += Y; temp[2] += X*Y; temp[3] += X*X; temp[4] += Y*Y; temp[5]++;
             }
         }
-
+        commonIndex[numRecords] = index;
         numRecords++;
-//        cout << numRecords << endl;
-
     }
     cout << "Finish reading " << numRecords << " Common Records." << endl;
 
-    SumDat.resize(numRecords); SNP.resize(numRecords);
+    SumDat.resize(numRecords); SNP.resize(numRecords); commonIndex.resize(numRecords);
     inFileI.close(); inFileV.close();
+    return false;
+}
+
+bool SummaryData::analysis()
+{
+    time_t  startTime, endTime;
+    struct tm * timeinfo;
+
+    time(&startTime);
+
+    sampleCheck();
+    loadNumMax();
+    read();
+//    printData();
+    RSquare();
+//    printRSquare();
+    output();
+
+    if (FileAF != "")
+    {
+        loadAlleleFreq();
+        aggregate();
+        outputAggregate();
+    }
+
+    time(&endTime);
+    timeinfo = localtime (&endTime);
+    double secondPassed = difftime(endTime,startTime);
+    cout << "[INFO]	Analyzed [ " << numRecords << " ] SNPs" << endl;
+    cout << "[INFO]	Analysis ends at: " <<  asctime(timeinfo);
+    cout << "[INFO]	Analysis took " << secondPassed << " seconds" << endl;
+
     return false;
 }
 
@@ -96,28 +116,6 @@ void SummaryData::printData()
     }
 }
 
-bool SummaryData::analysis()
-{
-    time_t  startTime, endTime;
-    struct tm * timeinfo;
-
-    time(&startTime);
-
-    read();
-//    printData();
-    RSquare();
-//    printRSquare();
-    output();
-
-    time(&endTime);
-    timeinfo = localtime (&endTime);
-    double secondPassed = difftime(endTime,startTime);
-    cout << "[INFO]	Analyzed [ " << numRecords << " ] SNPs" << endl;
-    cout << "[INFO]	Analysis ends at: " <<  asctime(timeinfo);
-    cout << "[INFO]	Analysis took " << secondPassed << " seconds" << endl;
-
-    return false;
-}
 
 vector<double> SummaryData::vectorwiseRSquare(vector<int> index)
 {
@@ -199,6 +197,97 @@ bool SummaryData::output()
     fs.close();
 
     cout << "Success! Please check RSquare result: " << OutputPrefix+".RSquareOutput" << endl;
+
+    return false;
+}
+
+bool SummaryData::loadNumMax()
+{
+    VcfFileReader inFile;
+    VcfHeader     header;
+    VcfRecord     record;
+
+    inFile.open(FileNameImputation, header);
+    NumMax = 0;
+    while (inFile.readRecord(record)) { NumMax++; }
+    inFile.close();
+    return false;
+}
+
+bool SummaryData::sampleCheck()
+{
+    VcfFileReader   inFileV, inFileI;
+    VcfHeader       headerV, headerI;
+    inFileV.open(FileNameValidation, headerV);
+    inFileI.open(FileNameImputation, headerI);
+
+    // check samples.
+    if (headerI.getNumSamples() != headerV.getNumSamples())
+    {
+        error("[Error: ] Number of samples do NOT match!");
+    }
+    numSamples = headerV.getNumSamples();
+    inFileI.close(); inFileV.close();
+    return false;
+}
+
+bool SummaryData::loadAlleleFreq()
+{
+    fstream fs;
+    fs.open(FileAF, ios_base::in);
+    string header, line;
+    string CHROM, POS, REF, ALT;
+    double AF;
+    getline(fs, header);
+    aggregateIndex.resize(7);
+
+    cout << "Loading Allele Frequency ..." << endl;
+    int j = 0;
+    for(int i : commonIndex)
+    {
+        while (j < i) { getline(fs,line); j++; }
+        fs >> CHROM >> POS >> REF >> ALT >> AF;
+        int group = min(-ceil(log10(AF)), 6.0);
+        aggregateIndex[group].push_back(i);
+        j++;
+    }
+    return false;
+}
+
+bool SummaryData::aggregate()
+{
+    unsigned long n;
+    vector<double> result;
+    aggregateRSquare.resize(aggregateIndex.size());
+    for (int i = 0; i < aggregateIndex.size(); i++)
+    {
+        n = aggregateIndex[i].size();
+        aggregateRSquare[i].resize(4);
+        vector<double> &temp = aggregateRSquare[i];
+        temp[0] = n;
+        if (n==0) temp[1] = temp[2] = temp[3] = 0;
+        else {result = vectorwiseRSquare(aggregateIndex[i]); temp[1]=result[0]; temp[2]=result[1]; temp[3] = result[2];}
+    }
+
+    return false;
+}
+
+bool SummaryData::outputAggregate()
+{
+    fstream fs;
+    fs.open(OutputPrefix+".aggregate.RSquareOutput", ios_base::out);
+    fs << std::fixed << std::setprecision(6);
+    fs << "AF\tnumSNP\tnumObsGeno\tGoldFreq\tRSquare\n";
+
+    for (int i = 0; i < aggregateRSquare.size(); i++)
+    {
+        vector<double> &temp = aggregateRSquare[i];
+        fs << "<1e-" << i << "\t";
+        fs << (int)temp[0] << "\t" << (int)temp[1] << "\t" << temp[2] << "\t" << temp[3] << "\n";
+    }
+    cout << "Success! Please check aggregate RSquare result: " << OutputPrefix+".aggregate.RSquareOutput" << endl;
+
+    fs.close();
 
     return false;
 }

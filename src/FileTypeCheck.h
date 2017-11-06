@@ -58,7 +58,7 @@ bool vcfCheck(int option, String filename)
 
     if(errorFlag)
     {
-        error("[ERROR:] Invalid VCFfile -%c: %s", option, filename.c_str());
+        error("[ERROR:] Invalid VCFfile -%c: %s\n", option, filename.c_str());
     }
 
     ifclose(fileStream);
@@ -75,7 +75,7 @@ bool outputCheck(String filename)
     }
     else
     {
-        error("[ERROR:] Invalid Prefix for Output -o: %s", filename.c_str());
+        error("[ERROR:] Invalid Prefix for Output -o: %s\n", filename.c_str());
     }
     return false;
 }
@@ -84,8 +84,8 @@ bool formatCheck(int option, String format)
 {
     if(format!="DS" and format!="GT")
     {
-        if(option == 'f')      error("[ERROR:] Invalid argument --validationFormat %s", format.c_str());
-        else if(option == 'g') error("[ERROR:] Invalid argument --imputationFormat %s", format.c_str());
+        if(option == 'f')      error("[ERROR:] Invalid argument --validationFormat %s\n", format.c_str());
+        else if(option == 'g') error("[ERROR:] Invalid argument --imputationFormat %s\n", format.c_str());
     }
     return false;
 }
@@ -98,12 +98,12 @@ bool AFCheck(String filename)
         string header;
         getline(fs, header);
         if (header!="CHROM\tPOS\tREF\tALT\tAF")
-            error("[ERROR:] Please check the format of AlleleFrequency file --AF: %s", filename.c_str());
+            error("[ERROR:] Please check the format of AlleleFrequency file --AF: %s\n", filename.c_str());
         fs.close();
     }
     else
     {
-        error("[ERROR:] Allele Frequency file does not exist --AF: %s", filename.c_str());
+        error("[ERROR:] Allele Frequency file does not exist --AF: %s\n", filename.c_str());
     }
     return false;
 

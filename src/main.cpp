@@ -23,16 +23,18 @@ void usage(FILE *fp)
     fprintf(fp, " --------------------------------------------------------------------------------\n");
     fprintf(fp, "\n (c) 2017 - Ketian Yu \n");
     fprintf(fp, "\n About:   This tool is used for evaluating the imputation accuracy of genotype data.\n"
-                "          Note vcf file of imputed genotype data should include dosage information.\n");
+                "          [Optional] Given AlleleFrequency, aggregated RSquares will be generated.\n");
     fprintf(fp,  " URL  :   https://github.com/yukt/RSquare\n");
 
 
     fprintf(fp, "\n Usage:   RSquare -v [Validation.vcf.gz]         // Input Validation File\n");
-    fprintf(fp, "                  -i [Imputed.vcf.gz]            // Input Imputed Dosage File\n");
-    fprintf(fp, "                  -o [RsquareOutput]             // Output Prefix\n");
-    fprintf(fp, "                  --validationFormat [GT/DS]     // Default: GT\n");
-    fprintf(fp, "                  --imputationFormat [GT/DS]     // Default: DS\n");
-    fprintf(fp, "                  --AF                           // [Optional] Allele Frequency for Imputation File.\n");
+    fprintf(fp, "                  -i [Imputation.vcf.gz]         // Input Imputation File\n");
+    fprintf(fp, "                  -o [RSquareOutputPrefix]       // Output Prefix\n");
+    fprintf(fp, "                  --validationFormat [GT/DS]     // [Optional] Default: GT\n");
+    fprintf(fp, "                  --imputationFormat [GT/DS]     // [Optional] Default: DS\n");
+    fprintf(fp, "                  --AF [AlleleFrequency File]    // [Optional] Input Allele Frequency File\n");
+    fprintf(fp, " Note: AlleleFrequency File should contain exactly the same SNPs with imputation file, \n"
+                "       and should begin with header 'CHROM POS REF ALT AF'.\n");
     fprintf(fp, "\n\n");
     exit(1);
 

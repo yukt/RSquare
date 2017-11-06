@@ -48,20 +48,21 @@ public:
 
     };
 
+    bool   analysis();
+
+
+private:
+    vector<double> vectorwiseRSquare( vector<int> index );
+    void   printData();
+    void   printRSquare();
     bool   sampleCheck();
     bool   loadNumMax();
     bool   loadAlleleFreq();
     bool   read();
-    void   printData();
-    bool   analysis();
     bool   RSquare();
-    void   printRSquare();
     bool   output();
     bool   aggregate();
     bool   outputAggregate();
-
-private:
-    vector<double> vectorwiseRSquare( vector<int> index );
 
 
 };

@@ -13,7 +13,10 @@ double readGT(VcfRecordGenotype& Genotype, int i)
     string info = *Genotype.getString("GT", i);
     if (info == ".") return -1;
     double dosage = 0;
-    for (char j : info) if( j =='1' ) dosage++;
+    for (char j : info) {
+        if( j == '1' ) dosage++;
+        else if (j == '.') return -1;
+    }
     return dosage;
 }
 
@@ -32,6 +35,7 @@ double readGP(VcfRecordGenotype& Genotype, int i)
     size_t pos = info.find(delimiter); info.erase(0, pos+1); pos = info.find(delimiter);
     string GP_01 = info.substr(0, pos); info.erase(0, pos+1);
     string GP_11 = info;
+    if (GP_01 == "." or GP_11 == ".") return -1;
     return stod(GP_01) + 2*stod(GP_11);
 }
 

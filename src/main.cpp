@@ -44,6 +44,7 @@ void version(FILE *fp)
 {
     fprintf(fp, "\n");
     fprintf(fp, "[INFO] Program version: 20171106\n");
+    fprintf(fp, "\n\n");
 }
 
 void finish(FILE *fp)
@@ -58,6 +59,7 @@ int main(int argc, char **argv) {
 
     if (argc < 2) { usage(stderr); return 1; }
     else if (strcmp(argv[1], "help") == 0 || strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h") == 0) { usage(stdout); return 0; }
+    else if (strcmp(argv[1], "version") == 0 || strcmp(argv[1], "--version") == 0) { version(stdout); return 0; }
 
     int c;
     SummaryData R;

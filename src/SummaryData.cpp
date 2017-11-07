@@ -185,7 +185,7 @@ bool SummaryData::sampleCheck()
     // check samples.
     if (headerI.getNumSamples() != headerV.getNumSamples())
     {
-        error("[Error:] Number of samples do NOT match!");
+        error("[Error] Number of samples do NOT match!");
     }
     numSamples = headerV.getNumSamples();
     inFileI.close(); inFileV.close();

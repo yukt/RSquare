@@ -87,12 +87,13 @@ int main(int argc, char **argv) {
             case 'a': AFCheck(optarg);          R.FileAF                = optarg;   break;
             case 'm':                           R.makeAF_flag           = true;     break;
             case '?': usage(stderr);                                                break;
-            default: error("[ERROR:] Unknown argument: %s\n", optarg);
+            default: error("[ERROR] Unknown argument: %s\n", optarg);
         }
     }
 
-    if(R.FileNameValidation =="") { error("[ERROR:] Missing Mandatory argument -v: %s\n");}
-    if(R.FileNameImputation =="") { error("[ERROR:] Missing Mandatory argument -i: %s\n");}
+    if(R.FileNameValidation =="") { error("[ERROR] Missing Mandatory argument -v\n");}
+    if(R.FileNameImputation =="") { error("[ERROR] Missing Mandatory argument -i\n");}
+    if(R.OutputPrefix =="")       { error("[ERROR] Missing Mandatory argument -o\n");}
 
     version(stdout);
     R.analysis();

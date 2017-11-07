@@ -33,6 +33,7 @@ public:
 
 
     // for aggregate use:
+    bool   makeAF_flag;
     vector <int> commonIndex;
     vector <vector<int>> aggregateIndex;
     vector <vector<double>> aggregateRSquare;
@@ -41,6 +42,7 @@ public:
     {
         validationFormat = "GT";
         imputationFormat = "DS";
+        makeAF_flag = false;
     };
 
     ~SummaryData()
@@ -63,6 +65,7 @@ private:
     bool   output();
     bool   aggregate();
     bool   outputAggregate();
+    bool   makeAF();
 
 
 };

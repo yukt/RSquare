@@ -1,9 +1,6 @@
 #include <iostream>
 #include <getopt.h>
 #include "FileTypeCheck.h"
-#include "SummaryData.h"
-
-
 
 void error(const char *format, ...)
 {
@@ -27,19 +24,33 @@ void usage(FILE *fp)
     fprintf(fp,  " URL  :   https://github.com/yukt/RSquare\n");
 
 
-    fprintf(fp, "\n Usage:   RSquare -v [Validation.vcf.gz]         // Input Validation File\n");
-    fprintf(fp, "                  -i [Imputation.vcf.gz]         // Input Imputation File\n");
-    fprintf(fp, "                  -o [RSquareOutputPrefix]       // Output Prefix\n");
-    fprintf(fp, "                  --validationFormat [GT/DS]     // [Optional] Default: GT\n");
-    fprintf(fp, "                  --imputationFormat [GT/DS]     // [Optional] Default: DS\n");
-    fprintf(fp, "                  --AF [AlleleFrequency File]    // [Optional] Input Allele Frequency File\n");
-    fprintf(fp, " Note: AlleleFrequency File should contain exactly the same SNPs with imputation file, \n"
-                "       and should begin with header 'CHROM POS REF ALT AF'.\n");
+    fprintf(fp, "\n Usage:   RSquare -v [Validation.vcf.gz]         // [Required] Input Validation File\n");
+    fprintf(fp, "                  -i [Imputation.vcf.gz]         // [Required] Input Imputation File\n");
+    fprintf(fp, "                  -o [RSquareOutputPrefix]       // [Required] Output Prefix\n");
+    fprintf(fp, "                  --validationFormat [GT/DS]     // [Optional] Genotype info format (Default: GT)\n");
+    fprintf(fp, "                  --imputationFormat [GT/DS]     // [Optional] Genotype info format (Default: DS)\n");
+    fprintf(fp, "                  --AF [AlleleFrequency File]    // [Optional] See Note (a)\n");
+    fprintf(fp, "                  --makeAF                       // [Optional] See Note (b)\n");
+    fprintf(fp, " Note: (a) AlleleFrequency file must contain exactly the same SNPs with imputation file, \n"
+                "           and must begin with header 'SNP AF'.\n"
+                "       (b) If AF information is included in INFO field in imputation vcf file, add --makeAF option,\n"
+                "           it will automatically generate AlleleFrequency file and calculate aggregate RSquare.");
     fprintf(fp, "\n\n");
     exit(1);
 
 }
 
+void version(FILE *fp)
+{
+    fprintf(fp, "\n");
+    fprintf(fp, "[INFO] Program version: 20171106\n");
+}
+
+void finish(FILE *fp)
+{
+    fprintf(fp, "\n");
+    fprintf(fp, "RSquare finished successfully.\n");
+}
 
 
 
@@ -60,6 +71,7 @@ int main(int argc, char **argv) {
         {"validationFormat", required_argument, NULL, 'f'},
         {"imputationFormat", required_argument, NULL, 'g'},
         {"AF",               required_argument, NULL, 'a'},
+        {"makeAF",           no_argument,       NULL, 'm'},
         {NULL,0,NULL,0}
     };
 
@@ -73,6 +85,7 @@ int main(int argc, char **argv) {
             case 'f': formatCheck(c, optarg);   R.validationFormat      = optarg;   break;
             case 'g': formatCheck(c, optarg);   R.imputationFormat      = optarg;   break;
             case 'a': AFCheck(optarg);          R.FileAF                = optarg;   break;
+            case 'm':                           R.makeAF_flag           = true;     break;
             case '?': usage(stderr);                                                break;
             default: error("[ERROR:] Unknown argument: %s\n", optarg);
         }
@@ -81,7 +94,8 @@ int main(int argc, char **argv) {
     if(R.FileNameValidation =="") { error("[ERROR:] Missing Mandatory argument -v: %s\n");}
     if(R.FileNameImputation =="") { error("[ERROR:] Missing Mandatory argument -i: %s\n");}
 
-
+    version(stdout);
     R.analysis();
+    finish(stdout);
     return 0;
 }

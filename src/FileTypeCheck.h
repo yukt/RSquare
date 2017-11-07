@@ -95,9 +95,9 @@ bool AFCheck(String filename)
     fstream fs(filename, ios_base::in);
     if(fs.is_open())
     {
-        string header;
-        getline(fs, header);
-        if (header!="CHROM\tPOS\tREF\tALT\tAF")
+        string SNP,AF;
+        fs >> SNP >> AF;
+        if (AF!="AF")
             error("[ERROR:] Please check the format of AlleleFrequency file --AF: %s\n", filename.c_str());
         fs.close();
     }

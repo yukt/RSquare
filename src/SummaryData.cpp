@@ -21,8 +21,6 @@ bool SummaryData::read()
     if (validationFormat == "DS") { getDosageV = &readDS; }
     if (imputationFormat == "GT") { getDosageI = &readGT; }
 
-    cout << "Reading VCFfiles ..." << endl;
-
     SumDat.resize(NumMax); SNP.resize(NumMax); commonIndex.resize(NumMax);
     numRecords = 0;
 
@@ -65,42 +63,9 @@ bool SummaryData::read()
         commonIndex[numRecords] = index;
         numRecords++;
     }
-    cout << "Finish reading " << numRecords << " Common Records." << endl;
 
     SumDat.resize(numRecords); SNP.resize(numRecords); commonIndex.resize(numRecords);
     inFileI.close(); inFileV.close();
-    return false;
-}
-
-bool SummaryData::analysis()
-{
-    time_t  startTime, endTime;
-    struct tm * timeinfo;
-
-    time(&startTime);
-
-    sampleCheck();
-    loadNumMax();
-    read();
-//    printData();
-    RSquare();
-//    printRSquare();
-    output();
-
-    if (FileAF != "")
-    {
-        loadAlleleFreq();
-        aggregate();
-        outputAggregate();
-    }
-
-    time(&endTime);
-    timeinfo = localtime (&endTime);
-    double secondPassed = difftime(endTime,startTime);
-    cout << "[INFO]	Analyzed [ " << numRecords << " ] SNPs" << endl;
-    cout << "[INFO]	Analysis ends at: " <<  asctime(timeinfo);
-    cout << "[INFO]	Analysis took " << secondPassed << " seconds" << endl;
-
     return false;
 }
 
@@ -161,7 +126,6 @@ vector<double> SummaryData::vectorwiseRSquare(vector<int> index)
 
 bool SummaryData::RSquare()
 {
-    cout << "Calculating RSquare ..." << endl;
     RSquareData.resize(numRecords);
     for (int i = 0; i < numRecords; i++)
     {
@@ -195,9 +159,6 @@ bool SummaryData::output()
     }
 
     fs.close();
-
-    cout << "Success! Please check RSquare result: " << OutputPrefix+".RSquareOutput" << endl;
-
     return false;
 }
 
@@ -224,7 +185,7 @@ bool SummaryData::sampleCheck()
     // check samples.
     if (headerI.getNumSamples() != headerV.getNumSamples())
     {
-        error("[Error: ] Number of samples do NOT match!");
+        error("[Error:] Number of samples do NOT match!");
     }
     numSamples = headerV.getNumSamples();
     inFileI.close(); inFileV.close();
@@ -236,17 +197,16 @@ bool SummaryData::loadAlleleFreq()
     fstream fs;
     fs.open(FileAF, ios_base::in);
     string header, line;
-    string CHROM, POS, REF, ALT;
+    string SNP;
     double AF;
     getline(fs, header);
     aggregateIndex.resize(7);
 
-    cout << "Loading Allele Frequency ..." << endl;
     int j = 0;
     for(int i : commonIndex)
     {
         while (j < i) { getline(fs,line); j++; }
-        fs >> CHROM >> POS >> REF >> ALT >> AF;
+        fs >> SNP >> AF;
         int group = min(-ceil(log10(AF)), 6.0);
         aggregateIndex[group].push_back(i);
         j++;
@@ -285,9 +245,88 @@ bool SummaryData::outputAggregate()
         fs << "<1e-" << i << "\t";
         fs << (int)temp[0] << "\t" << (int)temp[1] << "\t" << temp[2] << "\t" << temp[3] << "\n";
     }
-    cout << "Success! Please check aggregate RSquare result: " << OutputPrefix+".aggregate.RSquareOutput" << endl;
 
     fs.close();
+
+    return false;
+}
+
+bool SummaryData::makeAF()
+{
+    FileAF = OutputPrefix + ".AlleleFrequency";
+    fstream fs;
+    fs.open(FileAF, ios_base::out);
+    fs << "SNP\tAF" << endl;
+
+    VcfFileReader   inFile;
+    VcfHeader       header;
+    VcfRecord       record;
+
+    NumMax = 0;
+    inFile.open(FileNameImputation, header);
+    while (inFile.readRecord(record))
+    {
+        stringstream ss; ss << record.get1BasedPosition();
+        fs << string(record.getChromStr())+":"+ss.str()+":"+record.getRefStr()+":"+record.getAltStr()+"\t";
+        fs << *record.getInfo().getString("AF") << endl;
+        NumMax++;
+    }
+    fs.close();
+    inFile.close();
+    return false;
+}
+
+bool SummaryData::analysis()
+{
+    time_t  startTime, endTime;
+    struct tm * timeinfo;
+    double secondPassed;
+
+    sampleCheck();
+
+    if(makeAF_flag & FileAF == "")
+    {
+        cout << "[INFO] Making AlleleFrequency file ..." << endl;
+        time(&startTime);
+        makeAF();
+        time(&endTime);
+        secondPassed = difftime(endTime,startTime);
+        cout << "[INFO] Loaded [ " << NumMax << " ] SNPs from imputation vcffile: " + FileNameImputation << endl;
+        cout << "[INFO] AlleleFrequency Output: " + OutputPrefix + ".AlleleFrequency" << endl;
+        cout << "[INFO] Creating AlleleFrequency file took " << secondPassed << " seconds" << endl;
+    }
+    else
+    {
+        if(makeAF_flag) cout << "[WARN] --AF option detected. Skip --MakeAF process." << endl;
+        cout << "[INFO] Loading "<< imputationFormat << " information from imputation vcffile: " + FileNameImputation << " ..." << endl;
+        time(&startTime);
+        loadNumMax();
+        time(&endTime);
+        secondPassed = difftime(endTime,startTime);
+        cout << "[INFO] Loaded [ " << NumMax << " ] records" << endl;
+        cout << "[INFO] Loading process took " << secondPassed << " seconds" << endl;
+    }
+
+    time(&startTime); timeinfo = localtime(&startTime);
+    cout << "[INFO] Analysis started at: " << asctime(timeinfo);
+    cout << "[INFO] Loading "<< validationFormat << " information from validation vcffile: " + FileNameValidation << " ..." << endl;
+    read(); cout << "[INFO] Loaded [ " << numRecords << " ] common records\n" << "[INFO] Calculating RSquare ..." << endl;
+    RSquare();
+    output(); cout << "[INFO] Success! RSquare result: " + OutputPrefix + ".RSquareOutput" << endl;
+    if (FileAF != "")
+    {
+        cout << "[INFO] Calculating aggregate RSquare ..." << endl;
+        loadAlleleFreq();
+        aggregate();
+        outputAggregate();
+        cout << "[INFO] Success! Aggregate RSquare result: " + OutputPrefix+".aggregate.RSquareOutput" << endl;
+    }
+
+    time(&endTime); timeinfo = localtime(&endTime);
+    secondPassed = difftime(endTime,startTime);
+    cout << "[INFO] Analyzed [ " << numRecords << " ] SNPs" << endl;
+    cout << "[INFO] Analysis ends at: " <<  asctime(timeinfo);
+    cout << "[INFO] Analysis took " << secondPassed << " seconds" << endl;
 
     return false;
 }

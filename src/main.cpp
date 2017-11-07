@@ -51,6 +51,7 @@ void finish(FILE *fp)
 {
     fprintf(fp, "\n");
     fprintf(fp, "RSquare finished successfully.\n");
+    fprintf(fp, "\n\n");
 }
 
 

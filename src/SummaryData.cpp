@@ -18,8 +18,10 @@ bool SummaryData::read()
 
     double (*getDosageV) (VcfRecordGenotype&, int ) = &readGT;
     double (*getDosageI) (VcfRecordGenotype&, int ) = &readDS;
-    if (validationFormat == "DS") { getDosageV = &readDS; }
-    if (imputationFormat == "GT") { getDosageI = &readGT; }
+    if      (validationFormat == "DS") { getDosageV = &readDS; }
+    else if (validationFormat == "GP") { getDosageV = &readGP; }
+    if      (imputationFormat == "GT") { getDosageI = &readGT; }
+    else if (imputationFormat == "GP") { getDosageI = &readGP; }
 
     SumDat.resize(NumMax); SNP.resize(NumMax); commonIndex.resize(NumMax);
     numRecords = 0;

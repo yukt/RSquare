@@ -27,8 +27,8 @@ void usage(FILE *fp)
     fprintf(fp, "\n Usage:   RSquare -v [Validation.vcf.gz]         // [Required] Input Validation File\n");
     fprintf(fp, "                  -i [Imputation.vcf.gz]         // [Required] Input Imputation File\n");
     fprintf(fp, "                  -o [RSquareOutputPrefix]       // [Required] Output Prefix\n");
-    fprintf(fp, "                  --validationFormat [GT/DS]     // [Optional] Genotype info format (Default: GT)\n");
-    fprintf(fp, "                  --imputationFormat [GT/DS]     // [Optional] Genotype info format (Default: DS)\n");
+    fprintf(fp, "                  --validationFormat [GT/DS/GP]  // [Optional] Genotype info format (Default: GT)\n");
+    fprintf(fp, "                  --imputationFormat [GT/DS/GP]  // [Optional] Genotype info format (Default: DS)\n");
     fprintf(fp, "                  --AF [AlleleFrequency File]    // [Optional] See Note (a)\n");
     fprintf(fp, "                  --makeAF                       // [Optional] See Note (b)\n");
     fprintf(fp, " Note: (a) AlleleFrequency file must contain exactly the same SNPs with imputation file, \n"

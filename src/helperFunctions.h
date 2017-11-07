@@ -24,6 +24,17 @@ double readDS(VcfRecordGenotype& Genotype, int i)
     return stod(info);
 }
 
+double readGP(VcfRecordGenotype& Genotype, int i)
+{
+    string info = *Genotype.getString("GP", i);
+    if (info == ".") return -1;
+    string delimiter = ",";
+    size_t pos = info.find(delimiter); info.erase(0, pos+1); pos = info.find(delimiter);
+    string GP_01 = info.substr(0, pos); info.erase(0, pos+1);
+    string GP_11 = info;
+    return stod(GP_01) + 2*stod(GP_11);
+}
+
 
 int chr2int(String chr)
 {

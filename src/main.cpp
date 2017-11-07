@@ -15,12 +15,12 @@ void error(const char *format, ...)
 void usage(FILE *fp)
 {
     fprintf(fp, "\n");
-    fprintf(fp, " -------------------------------------------------------------------------------- \n");
-    fprintf(fp, "     R-Square Calculator - A Tool for Calculating Imputation Accuracy R-Square  \n");
-    fprintf(fp, " --------------------------------------------------------------------------------\n");
+    fprintf(fp, " ---------------------------------------------------------------------------------------------------- \n");
+    fprintf(fp, "               R-Square Calculator - A Tool for Calculating Imputation Accuracy R-Square  \n");
+    fprintf(fp, " ----------------------------------------------------------------------------------------------------\n");
     fprintf(fp, "\n (c) 2017 - Ketian Yu \n");
-    fprintf(fp, "\n About:   This tool is used for evaluating the imputation accuracy of genotype data.\n"
-                "          [Optional] Given AlleleFrequency, aggregated RSquares will be generated.\n");
+    fprintf(fp, "\n About:   This tool is used for evaluating the imputation accuracy of genotype data using R-Square.\n"
+                "          Given Allele Frequency (AF), imputation accuracy aggregated by AF will also be generated.\n");
     fprintf(fp,  " URL  :   https://github.com/yukt/RSquare\n");
 
 
@@ -34,7 +34,7 @@ void usage(FILE *fp)
     fprintf(fp, " Note: (a) AlleleFrequency file must contain exactly the same SNPs with imputation file, \n"
                 "           and must begin with header 'SNP AF'.\n"
                 "       (b) If AF information is included in INFO field in imputation vcf file, add --makeAF option,\n"
-                "           it will automatically generate AlleleFrequency file and calculate aggregate RSquare.");
+                "           it will automatically generate AlleleFrequency file and calculate aggregate R-Square.");
     fprintf(fp, "\n\n");
     exit(1);
 

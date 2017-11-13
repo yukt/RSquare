@@ -5,6 +5,7 @@
 #include "helperFunctions.h"
 #include <iomanip>
 #include <ctime>
+#include <cmath>
 
 bool SummaryData::read()
 {

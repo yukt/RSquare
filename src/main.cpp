@@ -43,7 +43,7 @@ void usage(FILE *fp)
 void version(FILE *fp)
 {
     fprintf(fp, "\n");
-    fprintf(fp, "[INFO] Program version: 20171106\n");
+    fprintf(fp, "[INFO] Program version: 20180110\n");
     fprintf(fp, "\n\n");
 }
 

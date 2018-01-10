@@ -27,7 +27,7 @@ public:
     // RSquare results:
     vector<string> SNP;
     vector<vector<double>> RSquareData;
-    // [0]numObsGeno   [1]GoldFreq  [2]RSquare
+    // [0]numObsGeno   [1]GoldFreq  [2]RSquare [3]ImputedFreq
     vector<vector<double>> SumDat;
     // [0]sumX [1]sumY [2]sumXY [3]sumX2 [4]sumY2 [5]n
 

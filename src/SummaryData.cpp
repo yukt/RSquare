@@ -88,7 +88,7 @@ void SummaryData::printData()
 vector<double> SummaryData::vectorwiseRSquare(vector<int> index)
 {
     vector<double> result;
-    result.resize(3);
+    result.resize(4);
 
     double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
     double EX, EY, varX, varY, cov;
@@ -107,7 +107,7 @@ vector<double> SummaryData::vectorwiseRSquare(vector<int> index)
 
     result[0] = n;
     if (n == 0){
-        result[1] = result[2] = 0;
+        result[1] = result[2] = result[3] = 0;
         return result;
     }
 
@@ -118,6 +118,7 @@ vector<double> SummaryData::vectorwiseRSquare(vector<int> index)
     cov  = sumXY*1.0/n - EX*EY;
 
     result[1] = min(EX,2-EX)*0.5;
+    result[3] = min(EY,2-EY)*0.5;
     if (varX == 0 or varY == 0){
         result[2] = 0;
         return result;
@@ -139,11 +140,11 @@ bool SummaryData::RSquare()
 
 void SummaryData::printRSquare()
 {
-    cout << "SNP\tnumObsGeno\tGoldFreq\tRSquare\n";
+    cout << "SNP\tnumObsGeno\tGoldFreq\tImputedFreq\tRSquare\n";
     for (int i = 0; i < numRecords; i++){
         vector<double> &temp = RSquareData[i];
         cout << SNP[i] << "\t";
-        cout << setprecision(6) << temp[0] << "\t" << temp[1] << "\t" << temp[2] << "\n";
+        cout << setprecision(6) << temp[0] << "\t" << temp[1] << "\t" << temp[3] << "\t" << temp[2] << "\n";
     }
 }
 
@@ -152,13 +153,13 @@ bool SummaryData::output()
     fstream fs;
     fs.open(OutputPrefix+".RSquareOutput", ios_base::out);
     fs << std::fixed << std::setprecision(6);
-    fs << "SNP\tnumObsGeno\tGoldFreq\tRSquare\n";
+    fs << "SNP\tnumObsGeno\tGoldFreq\tImputedFreq\tRSquare\n";
 
     for (int i = 0; i < numRecords; i++)
     {
         vector<double> &temp = RSquareData[i];
         fs << SNP[i] << "\t";
-        fs << (int)temp[0] << "\t" << temp[1] << "\t" << temp[2] << "\n";
+        fs << (int)temp[0] << "\t" << temp[1] << "\t" << temp[3] << "\t" << temp[2] << "\n";
     }
 
     fs.close();

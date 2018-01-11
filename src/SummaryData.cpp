@@ -42,7 +42,7 @@ bool SummaryData::read()
 
         stringstream ssV, ssI; ssV << posV; ssI << posI;
         string markerV = string(recordV.getChromStr()) + ":" + ssV.str()+":"+recordV.getRefStr()+":"+recordV.getAltStr();
-        string markerI = string(recordI.getChromStr()) + ":" + ssI.str()+":"+recordV.getRefStr()+":"+recordV.getAltStr();
+        string markerI = string(recordI.getChromStr()) + ":" + ssI.str()+":"+recordI.getRefStr()+":"+recordI.getAltStr();
         if (markerV != markerI)
             continue;
 

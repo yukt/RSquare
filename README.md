@@ -1,4 +1,4 @@
-# R-Square Calculator - A Tool for Calculating Imputation Accuracy
+# RSquare - A Tool for Calculating Imputation Accuracy
 ## Installation
 ```
 git clone https://github.com/yukt/RSquare.git

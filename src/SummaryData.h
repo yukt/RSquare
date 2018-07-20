@@ -40,6 +40,7 @@ public:
     {
         validationFormat = "GT";
         imputationFormat = "DS";
+        NumMax=99999999;
     };
 
     ~SummaryData()

@@ -29,16 +29,27 @@ bool SummaryData::read()
     numRecords = 0;
 
     bool EndRecord = !inFileV.readRecord(recordV); chrV = chr2int(recordV.getChromStr());
-    int index = -1;
+    int indexInImputed = -1, indexInValidation = 0;
     while (inFileI.readRecord(recordI) & !EndRecord)
     {
-        index++;
+        indexInImputed++;
         chrI = chr2int(recordI.getChromStr());
-        while ((chrV<chrI) & !EndRecord) {EndRecord = !inFileV.readRecord(recordV); chrV = chr2int(recordV.getChromStr());}
+        while ((chrV<chrI) & !EndRecord)
+        {
+            EndRecord = !inFileV.readRecord(recordV);
+            chrV = chr2int(recordV.getChromStr());
+            indexInValidation++;
+        }
         if    (chrV > chrI) continue;
 
         posI = recordI.get1BasedPosition(); posV = recordV.get1BasedPosition();
-        while ((posV<posI) & !EndRecord) {EndRecord = !inFileV.readRecord(recordV); chrV = chr2int(recordV.getChromStr()); posV = recordV.get1BasedPosition();}
+        while ((posV<posI) & !EndRecord)
+        {
+            EndRecord = !inFileV.readRecord(recordV);
+            chrV = chr2int(recordV.getChromStr());
+            posV = recordV.get1BasedPosition();
+            indexInValidation++;
+        }
         if    (chrV > chrI or posV > posI) continue;
 
         stringstream ssV, ssI; ssV << posV; ssI << posI;
@@ -64,7 +75,7 @@ bool SummaryData::read()
                 temp[0] += X; temp[1] += Y; temp[2] += X*Y; temp[3] += X*X; temp[4] += Y*Y; temp[5]++;
             }
         }
-        commonIndex[numRecords] = index;
+        commonIndex[numRecords] = indexInValidation;
         numRecords++;
     }
 

@@ -30,11 +30,8 @@ void usage(FILE *fp)
     fprintf(fp, "                  --validationFormat [GT/DS/GP]  // [Optional] Genotype info format (Default: GT)\n");
     fprintf(fp, "                  --imputationFormat [GT/DS/GP]  // [Optional] Genotype info format (Default: DS)\n");
     fprintf(fp, "                  --AF [AlleleFrequency File]    // [Optional] See Note (a)\n");
-    fprintf(fp, "                  --makeAF                       // [Optional] See Note (b)\n");
     fprintf(fp, " Note: (a) AlleleFrequency file must contain exactly the same SNPs with imputation file, \n"
-                "           and must begin with header 'SNP AF'.\n"
-                "       (b) If AF information is included in INFO field in imputation vcf file, add --makeAF option,\n"
-                "           it will automatically generate AlleleFrequency file and calculate aggregate R-Square.");
+                "           and must begin with header 'SNP AF'.\n");
     fprintf(fp, "\n\n");
     exit(1);
 
@@ -74,7 +71,6 @@ int main(int argc, char **argv) {
         {"validationFormat", required_argument, NULL, 'f'},
         {"imputationFormat", required_argument, NULL, 'g'},
         {"AF",               required_argument, NULL, 'a'},
-        {"makeAF",           no_argument,       NULL, 'm'},
         {NULL,0,NULL,0}
     };
 
@@ -88,7 +84,6 @@ int main(int argc, char **argv) {
             case 'f': formatCheck(c, optarg);   R.validationFormat      = optarg;   break;
             case 'g': formatCheck(c, optarg);   R.imputationFormat      = optarg;   break;
             case 'a': AFCheck(optarg);          R.FileAF                = optarg;   break;
-            case 'm':                           R.makeAF_flag           = true;     break;
             case '?': usage(stderr);                                                break;
             default: error("[ERROR] Unknown argument: %s\n", optarg);
         }

@@ -290,28 +290,6 @@ bool SummaryData::analysis()
 
     sampleCheck();
 
-    if(makeAF_flag & FileAF == "")
-    {
-        cout << "[INFO] Making AlleleFrequency file ..." << endl;
-        time(&startTime);
-        makeAF();
-        time(&endTime);
-        secondPassed = difftime(endTime,startTime);
-        cout << "[INFO] Loaded [ " << NumMax << " ] SNPs from imputation vcffile: " + FileNameImputation << endl;
-        cout << "[INFO] AlleleFrequency Output: " + OutputPrefix + ".AlleleFrequency" << endl;
-        cout << "[INFO] Creating AlleleFrequency file took " << secondPassed << " seconds" << endl;
-    }
-    else
-    {
-        if(makeAF_flag) cout << "[WARN] --AF option detected. Skip --MakeAF process." << endl;
-        cout << "[INFO] Loading "<< imputationFormat << " information from imputation vcffile: " + FileNameImputation << " ..." << endl;
-        time(&startTime);
-        loadNumMax();
-        time(&endTime);
-        secondPassed = difftime(endTime,startTime);
-        cout << "[INFO] Loaded [ " << NumMax << " ] records" << endl;
-        cout << "[INFO] Loading process took " << secondPassed << " seconds" << endl;
-    }
 
     time(&startTime); timeinfo = localtime(&startTime);
     cout << "[INFO] Analysis started at: " << asctime(timeinfo);

@@ -6,7 +6,8 @@
 #define RSQUARE_HELPERFUNCTIONS_H
 
 #include <StringBasics.h>
-#include "VcfFileReader.h"
+#include <VcfRecordGenotype.h>
+#include <VcfRecord.h>
 
 double readGT(VcfRecordGenotype& Genotype, int i)
 {

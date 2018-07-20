@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <ctime>
 #include <cmath>
+#include <VcfFileReader.h>
 
 bool SummaryData::read()
 {

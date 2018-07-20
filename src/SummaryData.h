@@ -10,8 +10,7 @@
 #include <Error.h>
 #include <fstream>
 #include <sstream>
-#include "VcfFileReader.h"
-
+#include <StringBasics.h>
 
 
 using namespace std;

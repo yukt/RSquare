@@ -18,7 +18,7 @@ using namespace std;
 class SummaryData
 {
 public:
-    String FileNameValidation, FileNameImputation, OutputPrefix, FileAF;
+    String FileNameValidation, FileNameImputation, OutputPrefix, FileNameAlleleFreq, FileNameBins;
     string validationFormat, imputationFormat;
     int numRecords, numSamples;
     int NumMax;
@@ -33,6 +33,7 @@ public:
 
     // for aggregate use:
     vector <int> commonIndex;
+    vector <double> bins;
     vector <vector<int>> aggregateIndex;
     vector <vector<double>> aggregateRSquare;
 
@@ -57,6 +58,7 @@ private:
     void   printRSquare();
     bool   sampleCheck();
     bool   loadNumMax();
+    bool   loadBins();
     bool   loadAlleleFreq();
     bool   read();
     bool   RSquare();

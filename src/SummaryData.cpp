@@ -209,12 +209,34 @@ bool SummaryData::sampleCheck()
     return false;
 }
 
+bool SummaryData::loadBins()
+{
+    ifstream inFile;
+    inFile.open(FileNameBins);
+
+    bins.clear();
+    bins.resize(99);
+
+    double x, y=-1e-4;
+    int count=0;
+    while(inFile >> x)
+    {
+        if(x < y || x > 1){ error("[Error] Please check the bin file.");}
+        bins[count] = x;
+        y = x;
+        count++;
+    }
+    bins.resize(count);
+    inFile.close();
+    return 0;
+}
+
 bool SummaryData::loadAlleleFreq()
 {
     fstream fs;
-    fs.open(FileAF, ios_base::in);
+    fs.open(FileNameAlleleFreq, ios_base::in);
     string header, line;
-    string SNP;
+
     double AF;
     getline(fs, header);
     aggregateIndex.resize(7);
@@ -223,7 +245,7 @@ bool SummaryData::loadAlleleFreq()
     for(int i : commonIndex)
     {
         while (j < i) { getline(fs,line); j++; }
-        fs >> SNP >> AF;
+        fs >> AF;
         int group = min(-ceil(log10(AF)), 6.0);
         aggregateIndex[group].push_back(i);
         j++;
@@ -268,30 +290,6 @@ bool SummaryData::outputAggregate()
     return false;
 }
 
-bool SummaryData::makeAF()
-{
-    FileAF = OutputPrefix + ".AlleleFrequency";
-    fstream fs;
-    fs.open(FileAF, ios_base::out);
-    fs << "SNP\tAF" << endl;
-
-    VcfFileReader   inFile;
-    VcfHeader       header;
-    VcfRecord       record;
-
-    NumMax = 0;
-    inFile.open(FileNameImputation, header);
-    while (inFile.readRecord(record))
-    {
-        stringstream ss; ss << record.get1BasedPosition();
-        fs << string(record.getChromStr())+":"+ss.str()+":"+record.getRefStr()+":"+record.getAltStr()+"\t";
-        fs << *record.getInfo().getString("AF") << endl;
-        NumMax++;
-    }
-    fs.close();
-    inFile.close();
-    return false;
-}
 
 bool SummaryData::analysis()
 {
@@ -301,6 +299,11 @@ bool SummaryData::analysis()
 
     sampleCheck();
 
+    if (FileNameAlleleFreq != ""){
+        if (FileNameBins !="") {
+            loadBins();
+        }
+    }
 
     time(&startTime); timeinfo = localtime(&startTime);
     cout << "[INFO] Analysis started at: " << asctime(timeinfo);
@@ -308,7 +311,7 @@ bool SummaryData::analysis()
     read(); cout << "[INFO] Loaded [ " << numRecords << " ] common records\n" << "[INFO] Calculating RSquare ..." << endl;
     RSquare();
     output(); cout << "[INFO] Success! RSquare result: " + OutputPrefix + ".RSquare" << endl;
-    if (FileAF != "")
+    if (FileNameAlleleFreq != "")
     {
         cout << "[INFO] Calculating aggregate RSquare ..." << endl;
         loadAlleleFreq();

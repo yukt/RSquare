@@ -251,6 +251,7 @@ bool SummaryData::loadAlleleFreq()
 
     int nBins = bins.size();
     aggregateIndex.resize(nBins);
+    aggregateAF.resize(nBins);
     counter.resize(nBins);
 
     for(int i=0; i<nBins; i++) { aggregateIndex[i].resize(commonIndex.size()); }
@@ -266,13 +267,14 @@ bool SummaryData::loadAlleleFreq()
         if(AF > bins[0]) { for(int i=1; i<nBins; i++) { if( AF < bins[i] ) { group = i-1; break; }}}
 
         aggregateIndex[group][counter[group]] = nRecordReadCommonIndex;
+        aggregateAF[group] += AF;
         counter[group]++;
 
         nRecordReadAF++;
         nRecordReadCommonIndex++;
     }
 
-    for(int i=0; i<nBins; i++) { aggregateIndex[i].resize(counter[i]); }
+    for(int i=0; i<nBins; i++) { aggregateIndex[i].resize(counter[i]); aggregateAF[i]/=counter[i]; }
     return 0;
 }
 
@@ -280,8 +282,8 @@ bool SummaryData::aggregate()
 {
     unsigned long n;
     vector<double> result;
-    aggregateRSquare.resize(aggregateIndex.size());
-    for (int i = 0; i < aggregateIndex.size(); i++)
+    aggregateRSquare.resize(aggregateIndex.size()-1);
+    for (int i = 0; i <aggregateRSquare.size(); i++)
     {
         n = aggregateIndex[i].size();
         aggregateRSquare[i].resize(4);
@@ -304,7 +306,7 @@ bool SummaryData::outputAggregate()
     for (int i = 0; i < aggregateRSquare.size(); i++)
     {
         vector<double> &temp = aggregateRSquare[i];
-        fs << "<1e-" << i << "\t";
+        fs << aggregateAF[i] << "\t";
         fs << (int)temp[0] << "\t" << (int)temp[1] << "\t" << temp[2] << "\t" << temp[3] << "\n";
     }
 

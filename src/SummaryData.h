@@ -35,6 +35,7 @@ public:
     vector <int> commonIndex;
     vector <double> bins;
     vector <vector<int>> aggregateIndex;
+    vector <double> aggregateAF;
     vector <vector<double>> aggregateRSquare;
 
     SummaryData()

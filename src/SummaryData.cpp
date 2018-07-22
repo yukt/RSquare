@@ -209,6 +209,14 @@ bool SummaryData::sampleCheck()
     return false;
 }
 
+void SummaryData::initiateBins()
+{
+    static const double arr[] = {0,0.0005,0.001,0.002,0.005,0.010,0.015,0.020,0.035,0.050};
+    bins.assign(arr, arr + sizeof(arr) / sizeof(arr[0]));
+    bins.resize(20);
+    for(int i=1; i<11; i++) { bins[9+i]=i*0.1; }
+}
+
 bool SummaryData::loadBins()
 {
     ifstream inFile;
@@ -238,19 +246,34 @@ bool SummaryData::loadAlleleFreq()
     string header, line;
 
     double AF;
+    vector<int> counter;
     getline(fs, header);
-    aggregateIndex.resize(7);
 
-    int j = 0;
-    for(int i : commonIndex)
+    int nBins = bins.size();
+    aggregateIndex.resize(nBins);
+    counter.resize(nBins);
+
+    for(int i=0; i<nBins; i++) { aggregateIndex[i].resize(commonIndex.size()); }
+
+    int nRecordReadAF = 0, nRecordReadCommonIndex = 0;
+    for(int index : commonIndex)
     {
-        while (j < i) { getline(fs,line); j++; }
+        while (nRecordReadAF < index) { getline(fs,line); nRecordReadAF++; }
         fs >> AF;
-        int group = min(-ceil(log10(AF)), 6.0);
-        aggregateIndex[group].push_back(i);
-        j++;
+
+        int group = nBins-1;
+
+        if(AF > bins[0]) { for(int i=1; i<nBins; i++) { if( AF < bins[i] ) { group = i-1; break; }}}
+
+        aggregateIndex[group][counter[group]] = nRecordReadCommonIndex;
+        counter[group]++;
+
+        nRecordReadAF++;
+        nRecordReadCommonIndex++;
     }
-    return false;
+
+    for(int i=0; i<nBins; i++) { aggregateIndex[i].resize(counter[i]); }
+    return 0;
 }
 
 bool SummaryData::aggregate()
@@ -300,9 +323,8 @@ bool SummaryData::analysis()
     sampleCheck();
 
     if (FileNameAlleleFreq != ""){
-        if (FileNameBins !="") {
-            loadBins();
-        }
+        if (FileNameBins !="") { loadBins(); }
+        else { initiateBins(); }
     }
 
     time(&startTime); timeinfo = localtime(&startTime);

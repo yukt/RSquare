@@ -59,13 +59,13 @@ private:
     bool   sampleCheck();
     bool   loadNumMax();
     bool   loadBins();
+    void   initiateBins();
     bool   loadAlleleFreq();
     bool   read();
     bool   RSquare();
     bool   output();
     bool   aggregate();
     bool   outputAggregate();
-    bool   makeAF();
 
 
 };

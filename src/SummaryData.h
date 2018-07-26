@@ -34,7 +34,9 @@ public:
     // for aggregate use:
     vector <int> commonIndex;
     vector <double> bins;
+    vector <string> pops;
     vector <vector<int>> aggregateIndex;
+//    vector <vector<int>> aggregateIndexInGold;
     vector <double> aggregateAF;
     vector <vector<double>> aggregateRSquare;
 
@@ -67,6 +69,7 @@ private:
     bool   output();
     bool   aggregate();
     bool   outputAggregate();
+    bool   outputIndex();
 
 
 };

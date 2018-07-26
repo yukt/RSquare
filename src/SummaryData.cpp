@@ -102,32 +102,33 @@ vector<double> SummaryData::vectorwiseRSquare(vector<int> index)
     vector<double> result;
     result.resize(5);
 
+    // X - validation Y - Imputed
     double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
     double EX, EY, varX, varY, cov;
-    int n = 0;
+    int numGeno = 0;
 
     for (int i: index)
     {
         vector<double> &temp = SumDat[i];
-        sumX  += temp[0];
-        sumY  += temp[1];
-        sumXY += temp[2];
-        sumX2 += temp[3];
-        sumY2 += temp[4];
-        n     += temp[5];
+        sumX    += temp[0];
+        sumY    += temp[1];
+        sumXY   += temp[2];
+        sumX2   += temp[3];
+        sumY2   += temp[4];
+        numGeno += temp[5];
     }
 
-    result[0] = n;
-    if (n == 0){
+    result[0] = numGeno;
+    if (numGeno == 0){
         result[1] = result[2] = result[3] = result[4] = 0;
         return result;
     }
 
-    EX   = sumX *1.0/n;
-    EY   = sumY *1.0/n;
-    varX = sumX2*1.0/n - EX*EX;
-    varY = sumY2*1.0/n - EY*EY;
-    cov  = sumXY*1.0/n - EX*EY;
+    EX   = sumX *1.0/numGeno;
+    EY   = sumY *1.0/numGeno;
+    varX = sumX2*1.0/numGeno - EX*EX;
+    varY = sumY2*1.0/numGeno - EY*EY;
+    cov  = sumXY*1.0/numGeno - EX*EY;
 
     result[1] = min(EX,2-EX)*0.5;
     result[3] = EX*0.5;
@@ -247,50 +248,105 @@ bool SummaryData::loadAlleleFreq()
 
     double AF;
     vector<int> counter;
+
+    int colCount=0, popCount=0;
+    int col_AF=-1;
+
+    char* pch, * end_str;
+    string tempString;
+
     getline(fs, header);
+    pch = strtok_r ((char*)header.c_str(),"\t", &end_str);
+
+    while(pch!=NULL)
+    {
+        colCount++;
+        if(colCount>1)
+        {
+            tempString=string(pch);
+            if(tempString=="AF") { col_AF=colCount; }
+            else { pops.push_back(tempString); popCount++; }
+        }
+        pch = strtok_r (NULL,"\t", &end_str);
+    }
+
+
 
     int nBins = bins.size();
     aggregateIndex.resize(nBins);
+//    aggregateIndexInGold.resize(nBins);
     aggregateAF.resize(nBins);
     counter.resize(nBins);
 
-    for(int i=0; i<nBins; i++) { aggregateIndex[i].resize(commonIndex.size()); }
-
-    int nRecordReadAF = 0, nRecordReadCommonIndex = 0;
-    for(int index : commonIndex)
+    for(int i=0; i<nBins; i++)
     {
-        while (nRecordReadAF < index) { getline(fs,line); nRecordReadAF++; }
-        fs >> AF;
-
-        int group = nBins-1;
-
-        if(AF > bins[0]) { for(int i=1; i<nBins; i++) { if( AF < bins[i] ) { group = i-1; break; }}}
-
-        aggregateIndex[group][counter[group]] = nRecordReadCommonIndex;
-        aggregateAF[group] += AF;
-        counter[group]++;
-
-        nRecordReadAF++;
-        nRecordReadCommonIndex++;
+        aggregateIndex[i].resize(commonIndex.size());
+//        aggregateIndexInGold[i].resize(commonIndex.size());
     }
 
-    for(int i=0; i<nBins; i++) { aggregateIndex[i].resize(counter[i]); aggregateAF[i]/=counter[i]; }
+    int nRecordReadAF = -1, nRecordReadCommonIndex = -1;
+    vector<string>::iterator iter = SNP.begin();
+
+    for(int index : commonIndex)
+    {
+        nRecordReadCommonIndex++;
+        while (nRecordReadAF < index) { getline(fs,line); nRecordReadAF++; }
+        pch = strtok_r ((char*)line.c_str(),"\t", &end_str);
+        string currentSNP = *iter;
+        if(string(pch)!= currentSNP) { error("[Error] Allele Frequency File Does NOT Match Validation VCF File!\n"); }
+        colCount = 1;
+
+        while(pch!=NULL)
+        {
+            colCount++;
+            pch = strtok_r (NULL,"\t", &end_str);
+            if(colCount == col_AF)
+            {
+                AF = stod(pch);
+                int group = nBins-1;
+
+                if(AF > bins[0]) { for(int i=1; i<nBins; i++) { if( AF < bins[i] ) { group = i-1; break; }}}
+
+                aggregateIndex[group][counter[group]] = nRecordReadCommonIndex;
+//                aggregateIndexInGold[group][counter[group]] = nRecordReadAF;
+                aggregateAF[group] += AF;
+                counter[group]++;
+                break;
+            }
+        }
+
+        iter++;
+    }
+
+    for(int i=0; i<nBins; i++)
+    {
+        aggregateIndex[i].resize(counter[i]);
+//        aggregateIndexInGold[i].resize(counter[i]);
+        aggregateAF[i]/=counter[i];
+    }
     return 0;
 }
 
 bool SummaryData::aggregate()
 {
-    unsigned long n;
+    unsigned long numSNP;
     vector<double> result;
     aggregateRSquare.resize(aggregateIndex.size()-1);
     for (int i = 0; i <aggregateRSquare.size(); i++)
     {
-        n = aggregateIndex[i].size();
+        numSNP = aggregateIndex[i].size();
         aggregateRSquare[i].resize(4);
         vector<double> &temp = aggregateRSquare[i];
-        temp[0] = n;
-        if (n==0) temp[1] = temp[2] = temp[3] = 0;
-        else {result = vectorwiseRSquare(aggregateIndex[i]); temp[1]=result[0]; temp[2]=result[1]; temp[3] = result[2];}
+        // aggregateRSquare [0]numSNP [1]GoldenFreq [2]ImputedFreq [3]RSquare
+
+        temp[0] = numSNP;
+        if (numSNP==0) { temp[1] = temp[2] = temp[3] = 0; }
+        else
+        {
+            result = vectorwiseRSquare(aggregateIndex[i]);
+            //result [0]numGeno [1]MAF [2]RSquare [3]GoldenAltFreq [4]ImputedAltFreq
+            temp[1]=result[3]; temp[2]=result[4]; temp[3] = result[2];
+        }
     }
 
     return false;
@@ -301,19 +357,41 @@ bool SummaryData::outputAggregate()
     fstream fs;
     fs.open(OutputPrefix+".aggRSquare", ios_base::out);
     fs << std::fixed << std::setprecision(6);
-    fs << "AF\tnumSNP\tnumObsGeno\tGoldFreq\tRSquare\n";
+    fs << "AlleleFreq\tRSquare\t\tnumSNP\tGoldenFreq\tImputedFreq\n";
 
     for (int i = 0; i < aggregateRSquare.size(); i++)
     {
         vector<double> &temp = aggregateRSquare[i];
-        fs << aggregateAF[i] << "\t";
-        fs << (int)temp[0] << "\t" << (int)temp[1] << "\t" << temp[2] << "\t" << temp[3] << "\n";
+        fs << aggregateAF[i] << "\t" << temp[3] << "\t" << (int)temp[0] << "\t" << temp[1] << "\t" << temp[2] << "\n";
     }
 
     fs.close();
 
     return false;
 }
+
+//bool SummaryData::outputIndex()
+//{
+//    fstream fs1, fs2;
+//    fs1.open(OutputPrefix+".bin.0.common.index", ios_base::out);
+//    fs2.open(OutputPrefix+".bin.0.golden.index", ios_base::out);
+//    vector<int> &temp1 = aggregateIndex[0];
+//    vector<int> &temp2 = aggregateIndexInGold[0];
+//    for(int j = 0; j < temp1.size(); j++) { fs1 << temp1[j] << "\n"; fs2 << temp2[j] << "\n"; }
+//    fs1.close();
+//    fs2.close();
+//
+////    for(int i = 0; i < aggregateIndex.size(); i++)
+////    {
+////        fstream fs;
+////        fs.open(OutputPrefix+".bin."+to_string(i).c_str()+".index", ios_base::out);
+////        vector<int> &temp = aggregateIndex[i];
+////        for(int j = 0; j < temp.size(); j++) { fs << temp[j] << "\n"; }
+////        fs.close();
+////    }
+//
+//    return 0;
+//}
 
 
 bool SummaryData::analysis()
@@ -341,6 +419,7 @@ bool SummaryData::analysis()
         loadAlleleFreq();
         aggregate();
         outputAggregate();
+//        outputIndex();
         cout << "[INFO] Success! Aggregate RSquare result: " + OutputPrefix+".aggRSquare" << endl;
     }
 

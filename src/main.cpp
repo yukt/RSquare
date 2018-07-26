@@ -30,9 +30,9 @@ void usage(FILE *fp)
     fprintf(fp, "                  --validationFormat [GT/DS/GP]  // [Optional] Genotype info format (Default: GT)\n");
     fprintf(fp, "                  --imputationFormat [GT/DS/GP]  // [Optional] Genotype info format (Default: DS)\n");
     fprintf(fp, "                  --AF [AlleleFrequency File]    // [Optional] \n");
-    fprintf(fp, "                  --bins [Bins File]             // [Optional] Default: ...\n");
-//    fprintf(fp, " Note: (a) AlleleFrequency file must contain exactly the same SNPs with validation file, \n"
-//                "           and must begin with header 'SNP AF'.\n");
+    fprintf(fp, "                  --bins [Bins File]             // [Optional] Default: See defaultBins.txt\n");
+    fprintf(fp, " Note: (a) AlleleFrequency file must contain two tab-delimited columns with header 'SNP\tAF',"
+                "           and SNPs should be same as the validation file, \n");
     fprintf(fp, "\n\n");
     exit(1);
 
@@ -41,7 +41,7 @@ void usage(FILE *fp)
 void version(FILE *fp)
 {
     fprintf(fp, "\n");
-    fprintf(fp, "[INFO] Program version: 20180110\n");
+    fprintf(fp, "[INFO] Program version: 20180725\n");
     fprintf(fp, "\n\n");
 }
 

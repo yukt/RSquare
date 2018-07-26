@@ -21,4 +21,4 @@ Note: (a) AlleleFrequency file must contain two tab-delimited columns with heade
 
 The tool will compute SNP-wise imputation accuracy (.RSquare);
 
-With `--AF` option, RSquare will automatically compute aggregated imputation accuracy (.aggRSquare) in addition; SNPs will be aggregated by Allele Frequency; if no Bins File is provided, it will use the default bins.
+With `--AF` option, RSquare will automatically compute aggregated imputation accuracy (.aggRSquare) in addition; SNPs will be aggregated by Allele Frequency; if no Bins File is provided, it will use the default bins; `--bins` will be ignored when no `--AF` is detected.

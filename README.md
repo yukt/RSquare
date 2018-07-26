@@ -1,5 +1,6 @@
 # RSquare - A Tool for Calculating Imputation Accuracy
 ## Installation
+Installation of RSquare requires [cget](http://cget.readthedocs.io/en/latest/src/intro.html#installing-cget) and [cmake v3.2](https://cmake.org/install/).
 ```
 git clone https://github.com/yukt/RSquare.git
 cd RSquare

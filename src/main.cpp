@@ -29,7 +29,7 @@ void usage(FILE *fp)
     fprintf(fp, "                  -o [OutputPrefix]              // [Required] Output Prefix\n");
     fprintf(fp, "                  --validationFormat [GT/DS/GP]  // [Optional] Genotype info format (Default: GT)\n");
     fprintf(fp, "                  --imputationFormat [GT/DS/GP]  // [Optional] Genotype info format (Default: DS)\n");
-    fprintf(fp, "                  --AF [AlleleFrequency File]    // [Optional] \n");
+    fprintf(fp, "                  --AF [AlleleFrequency File]    // [Optional] See Note (a)\n");
     fprintf(fp, "                  --bins [Bins File]             // [Optional] Default: See defaultBins.txt\n");
     fprintf(fp, " Note: (a) AlleleFrequency file must contain two tab-delimited columns with header 'SNP\tAF',\n"
                 "           and SNPs should be same as the validation file. \n");

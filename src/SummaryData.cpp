@@ -362,7 +362,7 @@ bool SummaryData::outputAggregate()
     for (int i = 0; i < aggregateRSquare.size(); i++)
     {
         vector<double> &temp = aggregateRSquare[i];
-        fs << aggregateAF[i] << "\t" << temp[3] << "\t" << (int)temp[0] << "\t" << temp[1] << "\t" << temp[2] << "\n";
+        if(temp[0]>0) { fs << aggregateAF[i] << "\t" << temp[3] << "\t" << (int)temp[0] << "\t" << temp[1] << "\t" << temp[2] << "\n"; }
     }
 
     fs.close();

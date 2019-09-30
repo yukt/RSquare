@@ -20,7 +20,7 @@ class SummaryData
 public:
     String FileNameValidation, FileNameImputation, OutputPrefix, FileNameAlleleFreq, FileNameBins;
     string validationFormat, imputationFormat;
-    int numRecords, numSamples;
+    int numRecords, numSamples, numCommonSNPsAnalyzed;
     int NumMax;
 
     // RSquare results:

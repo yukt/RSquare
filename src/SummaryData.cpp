@@ -286,6 +286,7 @@ bool SummaryData::loadAlleleFreq()
 
     int nRecordReadAF = -1, nRecordReadCommonIndex = -1;
     vector<string>::iterator iter = SNP.begin();
+    numCommonSNPsAnalyzed = 0;
 
     for(int index : commonIndex)
     {
@@ -302,6 +303,8 @@ bool SummaryData::loadAlleleFreq()
             pch = strtok_r (NULL,"\t", &end_str);
             if(colCount == col_AF)
             {
+                if(pch==NULL)
+                    break;
                 AF = stod(pch);
                 int group = nBins-1;
 
@@ -311,6 +314,7 @@ bool SummaryData::loadAlleleFreq()
 //                aggregateIndexInGold[group][counter[group]] = nRecordReadAF;
                 aggregateAF[group] += AF;
                 counter[group]++;
+                numCommonSNPsAnalyzed++;
                 break;
             }
         }
@@ -425,7 +429,7 @@ bool SummaryData::analysis()
 
     time(&endTime); timeinfo = localtime(&endTime);
     secondPassed = difftime(endTime,startTime);
-    cout << "[INFO] Analyzed [ " << numRecords << " ] SNPs" << endl;
+    cout << "[INFO] Analyzed [ " << numCommonSNPsAnalyzed << " ] SNPs" << endl;
     cout << "[INFO] Analysis ends at: " <<  asctime(timeinfo);
     cout << "[INFO] Analysis took " << secondPassed << " seconds" << endl;
 
